@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../common/colors.dart';
-
+import '../views/auth/signup_screen.dart';
 
 class AlreadyHaveAnAccountCheck extends StatelessWidget {
   final bool login;
@@ -16,11 +16,10 @@ class AlreadyHaveAnAccountCheck extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (login) {
-          // TODO:
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => const SignUpScreen()),
-          // );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SignUpScreen()),
+          );
         } else {
           Navigator.pop(context);
         }
@@ -42,6 +41,7 @@ class AlreadyHaveAnAccountCheck extends StatelessWidget {
               fontWeight: FontWeight.w600,
               fontSize: 12,
               color: AppColors.primary,
+              decoration: TextDecoration.underline,
             ),
           )
         ],

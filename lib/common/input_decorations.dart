@@ -16,7 +16,7 @@ class InputDecorations {
       InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w400,
           fontSize: 14,
           color: AppColors.hintColor,
         ),

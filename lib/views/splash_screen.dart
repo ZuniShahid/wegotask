@@ -1,11 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../common/colors.dart';
+import 'auth/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -23,6 +22,10 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _navigate() async {
+    // Get.offAll(() => const LoginScreen());
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      Get.offAll(() => const LoginScreen());
+    });
     // bool isLoggedIn = await AuthPrefrence().getUserLoggedIn();
 
     // if (isLoggedIn) {
@@ -42,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
       color: AppColors.primary,
       child: Center(
         child: Image.asset(
-          'assets/images/LMS_heading.png',
+          "assets/icons/logo.png",
           width: 30.w,
         ),
       ),

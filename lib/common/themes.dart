@@ -4,7 +4,8 @@ import 'package:sizer/sizer.dart';
 import 'colors.dart';
 
 class Themes {
-  static final light = ThemeData.light().copyWith(
+  static final light = ThemeData(
+    fontFamily: 'Lato',
     primaryColor: AppColors.primary,
     iconTheme: const IconThemeData(color: Colors.black),
     scaffoldBackgroundColor: Colors.white,
@@ -27,7 +28,8 @@ class Themes {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
-        fixedSize: Size(100.w, 6.h),
+        maximumSize: Size(100.w, 6.h),
+        minimumSize: Size(70.w, 6.h),
       ),
     ),
     appBarTheme: const AppBarTheme(
@@ -39,89 +41,12 @@ class Themes {
       foregroundColor: Color(0xFF272F4B),
       elevation: 0.0,
     ),
-    // textTheme: const TextTheme(
-    //   headline1: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   headline2: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   headline3: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   headline4: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   headline5: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   headline6: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   subtitle1: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   subtitle2: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   bodyText1: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   bodyText2: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   button: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   caption: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    //   overline: TextStyle(
-    //     fontSize: 12,
-    //     fontWeight: FontWeight.bold,
-    //     letterSpacing: -1.5,
-    //     color: Color(0xFF222222),
-    //   ),
-    // ),
     textSelectionTheme:
         const TextSelectionThemeData(selectionColor: Colors.grey),
-    // colorScheme: const ColorScheme.light(secondary: Colors.red),
+    colorScheme: const ColorScheme.light(
+      secondary: AppColors.secondary,
+      primary: AppColors.primary,
+    ),
   );
   static final dark = ThemeData.dark().copyWith(
     primaryColor: AppColors.primary,
