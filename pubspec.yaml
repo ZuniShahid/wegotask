@@ -16,9 +16,11 @@ dependencies:
   firebase_crashlytics: ^3.0.17
   firebase_database: ^10.0.16
   firebase_storage: ^11.0.16
+  flip_card: ^0.7.0
   flutter:
     sdk: flutter
   flutter_chat_bubble: ^2.0.2
+  flutter_slidable: ^2.0.0
   get: ^4.6.5
   get_storage: ^2.1.1
   http: ^0.13.5

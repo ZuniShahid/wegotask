@@ -5,8 +5,9 @@ import '../views/main/chat_box.dart';
 
 class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
   final String title;
+  final bool chatButton;
 
-  AppBarWidget({super.key, this.title = ''});
+  AppBarWidget({super.key, this.title = '', this.chatButton = true});
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +29,13 @@ class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
         ),
       ),
       actions: [
-        IconButton(
-            icon: Image.asset('assets/icons/message_icon.png'),
-            onPressed: () {
-              Get.to(() => const ChatBox());
-            }),
+        chatButton == false
+            ? Container()
+            : IconButton(
+                icon: Image.asset('assets/icons/message_icon.png'),
+                onPressed: () {
+                  Get.to(() => const ChatBox());
+                })
       ],
     );
   }

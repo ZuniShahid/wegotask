@@ -1,11 +1,15 @@
+import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../common/colors.dart';
 import '../../common/gradient_text.dart';
 import '../../common/input_decorations.dart';
 import '../../models/task_history_model.dart';
 import 'create_new_task.dart';
+import 'task_history_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,6 +19,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final TextEditingController _taskKey = TextEditingController();
+  GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,51 +82,19 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
-                Container(
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xFF00D2F3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey,
-                        offset: Offset(
-                          0.0,
-                          4.0,
-                        ),
-                        blurRadius: 4.0,
-                        spreadRadius: 2.0,
-                      ), //BoxShadow
-                      BoxShadow(
-                        color: Colors.white,
-                        offset: Offset(0.0, 0.0),
-                        blurRadius: 0.0,
-                        spreadRadius: 0.0,
-                      ), //BoxShadow
-                    ],
+                const SizedBox(height: 30),
+                FlipCard(
+                  key: cardKey,
+                  flipOnTouch: false,
+                  front: InkWell(
+                    onTap: () => cardKey.currentState!.toggleCard(),
+                    child: _assignTaskCircle(),
                   ),
-                  padding: const EdgeInsets.all(40),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(
-                        Icons.add,
-                        size: 66,
-                        color: Colors.white,
-                      ),
-                      Text(
-                        'ASSIGN TASK',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
+                  back: InkWell(
+                      onTap: () => cardKey.currentState!.toggleCard(),
+                      child: assingNewTask()),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
                 Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFFF5F5F5),
@@ -151,20 +126,25 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 40),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text(
+                  children: [
+                    const Text(
                       'TASK HISTORY',
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w800,
                           fontSize: 20),
                     ),
-                    Text(
-                      'SEE ALL',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 13),
+                    InkWell(
+                      onTap: () {
+                        Get.to(() => const TaskHistoryPage());
+                      },
+                      child: const Text(
+                        'SEE ALL',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13),
+                      ),
                     )
                   ],
                 ),
@@ -315,6 +295,169 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Container assingNewTask() {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFF00D2F3),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.grey,
+            offset: Offset(
+              0.0,
+              4.0,
+            ),
+            blurRadius: 4.0,
+            spreadRadius: 2.0,
+          ), //BoxShadow
+          BoxShadow(
+            color: Colors.white,
+            offset: Offset(0.0, 0.0),
+            blurRadius: 0.0,
+            spreadRadius: 0.0,
+          ), //BoxShadow
+        ],
+      ),
+      padding: const EdgeInsets.all(17),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const Text(
+            'ASSING',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+          ),
+          const Text(
+            'NEW TASK',
+            style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+                letterSpacing: 2),
+          ),
+          const SizedBox(
+            height: 25,
+          ),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.white),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                    ),
+                    controller: _taskKey,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintStyle: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () async {
+                    await Clipboard.setData(ClipboardData(text: _taskKey.text));
+                  },
+                  child: const Icon(
+                    Icons.copy_rounded,
+                    color: Colors.white,
+                  ),
+                )
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 25,
+          ),
+          Center(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: Colors.white,
+                foregroundColor: const Color(0xFF00D2F3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                minimumSize: Size(55.w, 6.h),
+                maximumSize: Size(55.w, 6.h),
+              ),
+              onPressed: () {},
+              child: const Center(
+                child: Text(
+                  'COPY CODE',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container _assignTaskCircle() {
+    return Container(
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: Color(0xFF00D2F3),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey,
+            offset: Offset(
+              0.0,
+              4.0,
+            ),
+            blurRadius: 4.0,
+            spreadRadius: 2.0,
+          ), //BoxShadow
+          BoxShadow(
+            color: Colors.white,
+            offset: Offset(0.0, 0.0),
+            blurRadius: 0.0,
+            spreadRadius: 0.0,
+          ), //BoxShadow
+        ],
+      ),
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(
+            Icons.add,
+            size: 66,
+            color: Colors.white,
+          ),
+          Text(
+            'ASSIGN TASK',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
       ),
     );
   }
