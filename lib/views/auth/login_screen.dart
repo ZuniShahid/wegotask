@@ -7,7 +7,7 @@ import '../../common/colors.dart';
 import '../../common/custom_validators.dart';
 import '../../common/input_decorations.dart';
 import '../../components/account_exists_check.dart';
-import '../home/home_page.dart';
+import '../main/home_page.dart';
 import 'forgot_password.dart';
 
 class LoginScreen extends StatefulWidget {

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../common/colors.dart';
 import '../../common/custom_validators.dart';
 import '../../common/input_decorations.dart';
+import 'otp_screen.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);
@@ -54,7 +56,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     const SizedBox(
                       width: 8,
                     ),
-                    Icon(
+                    const Icon(
                       Icons.phone,
                       color: AppColors.appGrey,
                     ),
@@ -89,7 +91,15 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   minimumSize: Size(85.w, 6.h),
                   maximumSize: Size(85.w, 6.h),
                 ),
-                onPressed: null,
+                onPressed: () {
+                  Get.to(
+                    () => const OTPScreen(
+                      phoneNumber: '0300******90',
+                    ),
+                    duration: const Duration(milliseconds: 30),
+                    transition: Transition.leftToRight,
+                  );
+                },
                 child: const Center(
                   child: Text(
                     'Send',

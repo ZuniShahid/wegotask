@@ -5,7 +5,7 @@ import 'colors.dart';
 
 class Themes {
   static final light = ThemeData(
-    fontFamily: 'Lato',
+    fontFamily: 'Inter',
     primaryColor: AppColors.primary,
     iconTheme: const IconThemeData(color: Colors.black),
     scaffoldBackgroundColor: Colors.white,

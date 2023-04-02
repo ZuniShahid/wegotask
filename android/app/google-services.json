@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "177668093930",
+    "project_id": "wego-task",
+    "storage_bucket": "wego-task.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:177668093930:android:13beb359305e6d0dbc2493",
+        "android_client_info": {
+          "package_name": "com.example.wegotask"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "177668093930-ib6r46p9lh9vs2ra4adjjmh0u8pan605.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArbwCus0Eey6dLcYpE1K7uCbu5gEn-SXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "177668093930-ib6r46p9lh9vs2ra4adjjmh0u8pan605.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

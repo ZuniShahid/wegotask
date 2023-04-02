@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../common/colors.dart';
 import '../../common/custom_validators.dart';
 import '../../common/input_decorations.dart';
+import 'login_screen.dart';
 
 class NewPassword extends StatefulWidget {
   const NewPassword({Key? key}) : super(key: key);
@@ -55,10 +57,16 @@ class _NewPasswordState extends State<NewPassword> {
                   minimumSize: Size(85.w, 6.h),
                   maximumSize: Size(85.w, 6.h),
                 ),
-                onPressed: null,
+                onPressed: () {
+                  Get.to(
+                    () => const LoginScreen(),
+                    duration: const Duration(milliseconds: 30),
+                    transition: Transition.leftToRight,
+                  );
+                },
                 child: const Center(
                   child: Text(
-                    'Sign In',
+                    'Save',
                     style: TextStyle(
                       fontSize: 15,
                     ),
@@ -86,7 +94,7 @@ class _NewPasswordState extends State<NewPassword> {
               const SizedBox(
                 width: 8,
               ),
-              Icon(
+              const Icon(
                 Icons.lock,
                 color: AppColors.appGrey,
               ),
@@ -135,7 +143,7 @@ class _NewPasswordState extends State<NewPassword> {
               const SizedBox(
                 width: 8,
               ),
-              Icon(
+              const Icon(
                 Icons.lock,
                 color: AppColors.appGrey,
               ),

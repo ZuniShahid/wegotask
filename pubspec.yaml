@@ -6,19 +6,23 @@ version: 1.0.0+1
 environment:
   sdk: '>=2.19.3 <3.0.0'
 dependencies:
+  chat_bubbles: null
   cloud_firestore: ^4.4.5
   connectivity_plus: ^3.0.2
   cupertino_icons: ^1.0.2
+  dropdown_button2: ^2.0.0
   firebase_auth: ^4.3.0
-  firebase_core: ^2.8.0
+  firebase_core: ^2.9.0
   firebase_crashlytics: ^3.0.17
   firebase_database: ^10.0.16
   firebase_storage: ^11.0.16
   flutter:
     sdk: flutter
+  flutter_chat_bubble: ^2.0.2
   get: ^4.6.5
   get_storage: ^2.1.1
   http: ^0.13.5
+  intl_phone_number_input: ^0.7.2
   pin_code_fields: ^7.4.0
   shared_preferences: ^2.0.20
   sizer: ^2.0.15
@@ -40,4 +44,6 @@ flutter:
     - family: Lato
       fonts:
         - asset: assets\fonts\Lato-Regular.ttf
-
+    - family: Inter
+      fonts:
+        - asset: assets\fonts\Inter-Regular.ttf

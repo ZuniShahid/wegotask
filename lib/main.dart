@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
+import 'package:wegotask/firebase_options.dart';
 
 import 'common/themes.dart';
 import 'prefrences/theme_prefrence.dart';
@@ -14,7 +16,7 @@ bool isCurrentlyOnNoInternet = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -43,7 +45,7 @@ class _MyAppState extends State<MyApp> {
       if (e == ConnectivityResult.none) {
         print('not connected');
         isCurrentlyOnNoInternet = true;
-      //  Get.to(()=>());
+        //  Get.to(()=>());
       } else {
         if (isCurrentlyOnNoInternet) {
           // Navigator.pop(navigatorKey.currentState!.overlay!.context);

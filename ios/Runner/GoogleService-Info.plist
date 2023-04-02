@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>177668093930-g3bhagbi3n5m8t131ah1m8ie8i6nuvd4.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.177668093930-g3bhagbi3n5m8t131ah1m8ie8i6nuvd4</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDPZoF6jF6LdEKvZ23l6XtIIouR1_K95Mc</string>
+	<key>GCM_SENDER_ID</key>
+	<string>177668093930</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.wegotask</string>
+	<key>PROJECT_ID</key>
+	<string>wego-task</string>
+	<key>STORAGE_BUCKET</key>
+	<string>wego-task.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:177668093930:ios:698ac17ea786d08dbc2493</string>
+</dict>
+</plist>

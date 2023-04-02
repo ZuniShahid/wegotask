@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:sizer/sizer.dart';
+import 'package:wegotask/views/auth/new_password.dart';
 
 import '../../common/colors.dart';
 
@@ -220,6 +222,8 @@ class _OTPScreenState extends State<OTPScreen> {
                   maximumSize: Size(85.w, 6.h),
                 ),
                 onPressed: () {
+                  Get.to(() => const NewPassword(), duration: const Duration(milliseconds: 30),
+                          transition: Transition.leftToRight,);
                   //       formKey.currentState!.validate();
                   // if (currentText.length != 6) {
                   //   errorController!.add(ErrorAnimationType.shake);

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../common/colors.dart';
@@ -19,12 +22,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
+
+  PhoneNumber number =
+      PhoneNumber(isoCode: Platform.localeName.split('_').last);
 
   @override
   Widget build(BuildContext context) {
@@ -280,6 +287,65 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ],
                     ),
                   ),
+                  _singleSpace(),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.textFieldColor,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      children: [
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        // Icon(
+                        //   Icons.lock_outline_sharp,
+                        //   color: _confirmPasswordController.text == ''
+                        //       ? AppColors.appGrey
+                        //       : Colors.black,
+                        // ),
+                        // const SizedBox(
+                        //   width: 20,
+                        // ),
+                        Expanded(
+                          child: InternationalPhoneNumberInput(
+                            onInputChanged: (PhoneNumber number) {
+                              setState(() {});
+                            },
+                            onInputValidated: (bool value) {
+                              print(value);
+                              setState(() {});
+                            },
+                            selectorConfig: const SelectorConfig(
+                              leadingPadding: 0,
+                              trailingSpace: false,
+                              selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                              setSelectorButtonAsPrefixIcon: true,
+                              showFlags: true,
+                            ),
+                            ignoreBlank: true,
+                            autoValidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            initialValue: number,
+                            inputDecoration:
+                                InputDecorations.inputDecorationAllBorder(
+                              hintText: 'Phone Number',
+                            ),
+                            spaceBetweenSelectorAndTextField: 0,
+                            isEnabled: true,
+                            textFieldController: _phoneController,
+                            formatInput: true,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                signed: false, decimal: false),
+                            inputBorder: InputBorder.none,
+                            onSaved: (PhoneNumber number) {
+                              print('On Saved: $number');
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
               _doubleSpace(),
@@ -331,6 +397,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _doubleSpace() {
     return const SizedBox(
       height: 90,
+    );
+  }
+
+  Widget phoneNumberField() {
+    return InternationalPhoneNumberInput(
+      onInputChanged: (PhoneNumber number) {
+        setState(() {});
+      },
+      onInputValidated: (bool value) {
+        print(value);
+        setState(() {});
+      },
+      selectorConfig: const SelectorConfig(
+        leadingPadding: 0,
+        trailingSpace: false,
+        selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+        setSelectorButtonAsPrefixIcon: true,
+        showFlags: true,
+      ),
+      ignoreBlank: true,
+      autoValidateMode: AutovalidateMode.onUserInteraction,
+      initialValue: PhoneNumber(isoCode: 'PK'),
+      inputDecoration: InputDecorations.inputDecorationAllBorder(
+        hintText: 'Phone Number',
+      ),
+      spaceBetweenSelectorAndTextField: 0,
+      isEnabled: true,
+      textFieldController: _phoneController,
+      formatInput: true,
+      keyboardType:
+          const TextInputType.numberWithOptions(signed: false, decimal: false),
+      inputBorder: InputBorder.none,
+      onSaved: (PhoneNumber number) {
+        print('On Saved: $number');
+      },
     );
   }
 }
