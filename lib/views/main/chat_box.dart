@@ -56,12 +56,94 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final int sendCount = 8;
-
   final int reciveCount = 8;
+  final int sendCount = 8;
 
   final TextEditingController _typeMessageController = TextEditingController();
 
+  getTitleText(String title) => Text(
+        title,
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 20,
+        ),
+      );
+
+  getSenderView(String text) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              children: [
+                const SizedBox(
+                  height: 25,
+                ),
+                Image.asset(
+                  'assets/icons/double_tick.png',
+                  width: 14,
+                  height: 8,
+                ),
+              ],
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            Expanded(
+              child: BubbleSpecialOne(
+                text: text,
+                isSender: true,
+                color: AppColors.chatColor,
+                textStyle: const TextStyle(
+                  fontSize: 12,
+                ),
+              ),
+            ),
+            const CircleAvatar(
+                backgroundImage:
+                    AssetImage('assets/icons/no_task_history.png')),
+          ],
+        ),
+      );
+
+  getReceiverView(String text) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const CircleAvatar(
+                backgroundImage:
+                    AssetImage('assets/icons/no_task_history.png')),
+            Expanded(
+              child: BubbleSpecialOne(
+                text: text,
+                isSender: false,
+                color: AppColors.chatColor,
+                textStyle: const TextStyle(
+                  fontSize: 12,
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            Column(
+              children: [
+                const SizedBox(
+                  height: 25,
+                ),
+                Image.asset(
+                  'assets/icons/double_tick.png',
+                  width: 14,
+                  height: 8,
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -158,88 +240,4 @@ class _ChatScreenState extends State<ChatScreen> {
           )),
     ]);
   }
-
-  getTitleText(String title) => Text(
-        title,
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-        ),
-      );
-
-  getSenderView(String text) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              children: [
-                const SizedBox(
-                  height: 25,
-                ),
-                Image.asset(
-                  'assets/icons/double_tick.png',
-                  width: 14,
-                  height: 8,
-                ),
-              ],
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            Expanded(
-              child: BubbleSpecialOne(
-                text: text,
-                isSender: true,
-                color: AppColors.chatColor,
-                textStyle: const TextStyle(
-                  fontSize: 12,
-                ),
-              ),
-            ),
-            const CircleAvatar(
-                backgroundImage:
-                    AssetImage('assets/icons/no_task_history.png')),
-          ],
-        ),
-      );
-
-  getReceiverView(String text) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const CircleAvatar(
-                backgroundImage:
-                    AssetImage('assets/icons/no_task_history.png')),
-            Expanded(
-              child: BubbleSpecialOne(
-                text: text,
-                isSender: false,
-                color: AppColors.chatColor,
-                textStyle: const TextStyle(
-                  fontSize: 12,
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            Column(
-              children: [
-                const SizedBox(
-                  height: 25,
-                ),
-                Image.asset(
-                  'assets/icons/double_tick.png',
-                  width: 14,
-                  height: 8,
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
 }

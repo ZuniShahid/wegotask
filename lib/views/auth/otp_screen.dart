@@ -9,26 +9,35 @@ import 'package:wegotask/views/auth/new_password.dart';
 import '../../common/colors.dart';
 
 class OTPScreen extends StatefulWidget {
-  final String phoneNumber;
-
   const OTPScreen({Key? key, required this.phoneNumber}) : super(key: key);
+
+  final String phoneNumber;
 
   @override
   State<OTPScreen> createState() => _OTPScreenState();
 }
 
 class _OTPScreenState extends State<OTPScreen> {
-  TextEditingController textEditingController = TextEditingController();
+  String currentText = "";
+  String error = "";
   // final FirebaseAuth _auth = FirebaseAuth.instance;
   StreamController<ErrorAnimationType>? errorController;
+
+  final formKey = GlobalKey<FormState>();
   bool hasError = false;
   bool loader = false;
   bool resendLoader = false;
-  String currentText = "";
-  String error = "";
-  Timer? _timer;
+  TextEditingController textEditingController = TextEditingController();
+
   int _counter = 60;
-  final formKey = GlobalKey<FormState>();
+  Timer? _timer;
+
+  @override
+  void initState() {
+    errorController = StreamController<ErrorAnimationType>();
+    startTimer();
+    super.initState();
+  }
 
   startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -42,11 +51,37 @@ class _OTPScreenState extends State<OTPScreen> {
     });
   }
 
-  @override
-  void initState() {
-    errorController = StreamController<ErrorAnimationType>();
-    startTimer();
-    super.initState();
+  sendOTP() {
+    // _auth.verifyPhoneNumber(
+    //     phoneNumber: widget.phoneNumber,
+    //     timeout: const Duration(seconds: 60),
+    //     verificationCompleted: (AuthCredential authCredential) {
+    //       print("verificationCompleted");
+    //       print(authCredential);
+    //     },
+    //     verificationFailed: (authException) {
+    //       print("verificationFailed");
+    //       print(authException.message);
+    //       Get.snackbar("Error", authException.message!);
+    //       setState(() {
+    //         _counter = 60;
+    //         resendLoader = false;
+    //       });
+    //       startTimer();
+    //     },
+    //     codeSent: (String verificationId, int? token) {
+    //       print("code sent");
+    //       Get.snackbar("Code Sent", "");
+    //       setState(() {
+    //         _counter = 60;
+    //         resendLoader = false;
+    //       });
+    //       startTimer();
+    //     },
+    //     codeAutoRetrievalTimeout: (String verificationId) {
+    //       print("Timout");
+    //       print(verificationId);
+    //     });
   }
 
   @override
@@ -288,38 +323,5 @@ class _OTPScreenState extends State<OTPScreen> {
         ),
       ),
     );
-  }
-
-  sendOTP() {
-    // _auth.verifyPhoneNumber(
-    //     phoneNumber: widget.phoneNumber,
-    //     timeout: const Duration(seconds: 60),
-    //     verificationCompleted: (AuthCredential authCredential) {
-    //       print("verificationCompleted");
-    //       print(authCredential);
-    //     },
-    //     verificationFailed: (authException) {
-    //       print("verificationFailed");
-    //       print(authException.message);
-    //       Get.snackbar("Error", authException.message!);
-    //       setState(() {
-    //         _counter = 60;
-    //         resendLoader = false;
-    //       });
-    //       startTimer();
-    //     },
-    //     codeSent: (String verificationId, int? token) {
-    //       print("code sent");
-    //       Get.snackbar("Code Sent", "");
-    //       setState(() {
-    //         _counter = 60;
-    //         resendLoader = false;
-    //       });
-    //       startTimer();
-    //     },
-    //     codeAutoRetrievalTimeout: (String verificationId) {
-    //       print("Timout");
-    //       print(verificationId);
-    //     });
   }
 }

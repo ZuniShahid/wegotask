@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,8 @@ import '../../common/colors.dart';
 import '../../common/custom_validators.dart';
 import '../../common/input_decorations.dart';
 import '../../components/account_exists_check.dart';
+import '../../databse/auth_helper.dart';
+import '../../databse/collections.dart';
 import '../main/home_page.dart';
 import 'forgot_password.dart';
 
@@ -18,79 +21,25 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController idController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
   bool checkboxValue = false;
+  final TextEditingController idController = TextEditingController();
   bool isLoading = false;
-  bool _passwordVisible = false;
+  bool loader = false;
+  final TextEditingController passwordController = TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
   final bool _isValidate = false;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                doubleSpace(),
-                Center(
-                  child: Image.asset(
-                    'assets/icons/logo.png',
-                    width: 70,
-                    height: 80,
-                  ),
-                ),
-                doubleSpace(),
-                const Center(
-                  child: Text(
-                    'Login To You Account',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 20,
-                    ),
-                  ),
-                ),
-                doubleSpace(),
-                _innerBody(),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    minimumSize: Size(85.w, 6.h),
-                    maximumSize: Size(85.w, 6.h),
-                  ),
-                  onPressed: _isValidate
-                      ? () async {
-                          if (_formKey.currentState!.validate()) {
-                            _loginButtonPressed();
-                          }
-                        }
-                      : () {
-                          Get.to(() => const HomePage());
-                        },
-                  child: const Center(
-                    child: Text(
-                      'Sign In',
-                      style: TextStyle(
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ),
-                singleSpace(),
-                const AlreadyHaveAnAccountCheck(
-                  login: true,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+  bool _passwordVisible = false;
+
+  Widget doubleSpace() {
+    return const SizedBox(
+      height: 40,
+    );
+  }
+
+  Widget singleSpace() {
+    return const SizedBox(
+      height: 20,
     );
   }
 
@@ -226,23 +175,104 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget doubleSpace() {
-    return const SizedBox(
-      height: 40,
-    );
-  }
-
-  Widget singleSpace() {
-    return const SizedBox(
-      height: 20,
-    );
-  }
-
   void _loginButtonPressed() {
     var body = {
       'email': idController.text,
       'password': passwordController.text,
     };
     // PageTransition.fadeInNavigation(page: const LoginScreen());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                doubleSpace(),
+                Center(
+                  child: Image.asset(
+                    'assets/icons/logo.png',
+                    width: 70,
+                    height: 80,
+                  ),
+                ),
+                doubleSpace(),
+                const Center(
+                  child: Text(
+                    'Login To You Account',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                doubleSpace(),
+                _innerBody(),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    minimumSize: Size(85.w, 6.h),
+                    maximumSize: Size(85.w, 6.h),
+                  ),
+                  onPressed: _isValidate
+                      ? () async {
+                          if (_formKey.currentState!.validate()) {
+                            _loginButtonPressed();
+                          }
+                        }
+                      : () async {
+                          setState(() {
+                            loader = true;
+                          });
+
+                          var status = await AuthHelper.login(
+                              Collections.USERS,
+                              idController.text.trim(),
+                              passwordController.text);
+                          setState(() {
+                            loader = false;
+                          });
+                          if (status == 'true') {
+                            Get.offAll(() => const HomePage());
+                          } else {
+                            print(status);
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.error,
+                              animType: AnimType.rightSlide,
+                              title: 'Oops',
+                              desc: status,
+                              dialogBackgroundColor: Colors.grey.shade800,
+                              btnOkOnPress: () {},
+                            ).show();
+                          }
+                        },
+                  child: const Center(
+                    child: Text(
+                      'Sign In',
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+                singleSpace(),
+                const AlreadyHaveAnAccountCheck(
+                  login: true,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

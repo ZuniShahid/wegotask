@@ -4,7 +4,10 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../common/colors.dart';
+import '../global_variables.dart';
 import 'auth/login_screen.dart';
+import 'main/home_page.dart';
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -22,21 +25,17 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _navigate() async {
-    // Get.offAll(() => const LoginScreen());
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      Get.offAll(() => const LoginScreen());
-    });
-    // bool isLoggedIn = await AuthPrefrence().getUserLoggedIn();
+    bool isLoggedIn = await getUserLoggedIn();
 
-    // if (isLoggedIn) {
-    //   Future.delayed(const Duration(milliseconds: 2000), () {
-    //     Get.offAll(() => const HomePage());
-    //   });
-    // } else {
-    //   Future.delayed(const Duration(milliseconds: 2000), () {
-    //     Get.offAll(() => const LoginScreen());
-    //   });
-    // }
+    if (isLoggedIn) {
+      Future.delayed(const Duration(milliseconds: 2000), () {
+        Get.offAll(() => const HomePage());
+      });
+    } else {
+      Future.delayed(const Duration(milliseconds: 2000), () {
+        Get.offAll(() => const LoginScreen());
+      });
+    }
   }
 
   @override

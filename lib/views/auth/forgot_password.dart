@@ -18,6 +18,18 @@ class ForgotPassword extends StatefulWidget {
 class _ForgotPasswordState extends State<ForgotPassword> {
   final TextEditingController _phoneNumberController = TextEditingController();
 
+  Widget doubleSpace() {
+    return const SizedBox(
+      height: 40,
+    );
+  }
+
+  Widget singleSpace() {
+    return const SizedBox(
+      height: 20,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,18 +129,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget doubleSpace() {
-    return const SizedBox(
-      height: 40,
-    );
-  }
-
-  Widget singleSpace() {
-    return const SizedBox(
-      height: 20,
     );
   }
 }

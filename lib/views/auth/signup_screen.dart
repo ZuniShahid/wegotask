@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
@@ -9,7 +10,11 @@ import '../../common/colors.dart';
 import '../../common/custom_validators.dart';
 import '../../common/input_decorations.dart';
 import '../../components/account_exists_check.dart';
-import 'otp_screen.dart';
+import '../../databse/auth_helper.dart';
+import '../../databse/collections.dart';
+import '../../databse/data_helper.dart';
+import '../../global_variables.dart';
+import '../main/home_page.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -19,19 +24,165 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-  bool _passwordVisible = false;
-  bool _confirmPasswordVisible = false;
-
+  bool loader = false;
   PhoneNumber number =
       PhoneNumber(isoCode: Platform.localeName.split('_').last);
+
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  bool _confirmPasswordVisible = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _passwordVisible = false;
+  final TextEditingController _phoneController = TextEditingController();
+
+  Widget phoneNumberField() {
+    return InternationalPhoneNumberInput(
+      onInputChanged: (PhoneNumber number) {
+        setState(() {});
+      },
+      onInputValidated: (bool value) {
+        print(value);
+        setState(() {});
+      },
+      selectorConfig: const SelectorConfig(
+        leadingPadding: 0,
+        trailingSpace: false,
+        selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+        setSelectorButtonAsPrefixIcon: true,
+        showFlags: true,
+      ),
+      ignoreBlank: true,
+      autoValidateMode: AutovalidateMode.onUserInteraction,
+      initialValue: PhoneNumber(isoCode: 'PK'),
+      inputDecoration: InputDecorations.inputDecorationAllBorder(
+        hintText: 'Phone Number',
+      ),
+      spaceBetweenSelectorAndTextField: 0,
+      isEnabled: true,
+      textFieldController: _phoneController,
+      formatInput: true,
+      keyboardType:
+          const TextInputType.numberWithOptions(signed: false, decimal: false),
+      inputBorder: InputBorder.none,
+      onSaved: (PhoneNumber number) {
+        print('On Saved: $number');
+      },
+    );
+  }
+
+  registerUser() async {
+    final result = await AuthHelper.signUp(Collections.USERS);
+    if (result == 'true') {
+      var status = await AuthHelper.login(
+          Collections.USERS, userSignUp.email, userSignUp.password);
+      if (status == "true") {
+        DataHelper.saveFcmToken(
+          Collections.FCM_TOKENS,
+          userData!.id,
+        );
+        setState(() {
+          loader = false;
+        });
+        Get.offAll(() => const HomePage());
+      } else {
+        setState(() {
+          loader = false;
+        });
+        Get.snackbar('Error', status);
+      }
+    } else {
+      setState(() {
+        loader = false;
+      });
+    }
+  }
+
+  Future<void> _signupButtonPressed() async {
+    setState(() {
+      loader = true;
+    });
+    userSignUp.name = _firstNameController.text;
+    userSignUp.lastName = _lastNameController.text;
+    userSignUp.email = _emailController.text.trim();
+    userSignUp.password = _passwordController.text;
+    bool uniqueUsername = await AuthHelper.checkUniqueness(
+        'email', _emailController.text, Collections.USERS);
+    if (uniqueUsername) {
+      bool uniqueEmail = await AuthHelper.checkUniqueness(
+          'name', _firstNameController.text, Collections.USERS);
+      if (uniqueEmail) {
+        bool isUnique = await AuthHelper.checkUniqueness(
+            'contact', 'userSignUp.contact', Collections.USERS);
+        if (isUnique) {
+          setState(() {
+            loader = false;
+          });
+          registerUser();
+        } else {
+          setState(() {
+            loader = false;
+          });
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.error,
+            animType: AnimType.rightSlide,
+            title: 'Oops',
+            desc: 'Phone number is already taken',
+            dialogBackgroundColor: Colors.grey.shade800,
+            btnOkOnPress: () {},
+          ).show();
+        }
+      } else {
+        setState(() {
+          loader = false;
+        });
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.error,
+          animType: AnimType.rightSlide,
+          title: 'Oops',
+          desc: 'Email Already Exists',
+          dialogBackgroundColor: Colors.grey.shade800,
+          btnOkOnPress: () {},
+        ).show();
+      }
+    } else {
+      setState(() {
+        loader = false;
+      });
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.rightSlide,
+        title: 'Oops',
+        desc: 'Username Already Exists',
+        dialogBackgroundColor: Colors.grey.shade800,
+        btnOkOnPress: () {},
+      ).show();
+    }
+
+    // if (_formKey.currentState!.validate()) {
+    //   // authController.userRegister(body);
+    //   //   // PageTransition.fadeInNavigation(page: const LoginScreen());
+    // }
+  }
+
+  Widget _singleSpace() {
+    return const SizedBox(
+      height: 20,
+    );
+  }
+
+  Widget _doubleSpace() {
+    return const SizedBox(
+      height: 90,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -377,61 +528,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  void _signupButtonPressed() {
-    Get.to(() => const OTPScreen(phoneNumber: '0315'));
-    // if (_formKey.currentState!.validate()) {
-    //   // authController.userRegister(body);
-    //   //   // PageTransition.fadeInNavigation(page: const LoginScreen());
-    // }
-  }
-
-  Widget _singleSpace() {
-    return const SizedBox(
-      height: 20,
-    );
-  }
-
-  Widget _doubleSpace() {
-    return const SizedBox(
-      height: 90,
-    );
-  }
-
-  Widget phoneNumberField() {
-    return InternationalPhoneNumberInput(
-      onInputChanged: (PhoneNumber number) {
-        setState(() {});
-      },
-      onInputValidated: (bool value) {
-        print(value);
-        setState(() {});
-      },
-      selectorConfig: const SelectorConfig(
-        leadingPadding: 0,
-        trailingSpace: false,
-        selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-        setSelectorButtonAsPrefixIcon: true,
-        showFlags: true,
-      ),
-      ignoreBlank: true,
-      autoValidateMode: AutovalidateMode.onUserInteraction,
-      initialValue: PhoneNumber(isoCode: 'PK'),
-      inputDecoration: InputDecorations.inputDecorationAllBorder(
-        hintText: 'Phone Number',
-      ),
-      spaceBetweenSelectorAndTextField: 0,
-      isEnabled: true,
-      textFieldController: _phoneController,
-      formatInput: true,
-      keyboardType:
-          const TextInputType.numberWithOptions(signed: false, decimal: false),
-      inputBorder: InputBorder.none,
-      onSaved: (PhoneNumber number) {
-        print('On Saved: $number');
-      },
     );
   }
 }

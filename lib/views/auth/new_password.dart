@@ -15,71 +15,10 @@ class NewPassword extends StatefulWidget {
 }
 
 class _NewPasswordState extends State<NewPassword> {
-  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _cPasswordController = TextEditingController();
-  bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              doubleSpace(),
-              Center(
-                child: Image.asset(
-                  'assets/icons/logo.png',
-                  width: 70,
-                  height: 80,
-                ),
-              ),
-              doubleSpace(),
-              const Center(
-                child: Text(
-                  'Create new password',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 20,
-                  ),
-                ),
-              ),
-              doubleSpace(),
-              innerBody(),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  minimumSize: Size(85.w, 6.h),
-                  maximumSize: Size(85.w, 6.h),
-                ),
-                onPressed: () {
-                  Get.to(
-                    () => const LoginScreen(),
-                    duration: const Duration(milliseconds: 30),
-                    transition: Transition.leftToRight,
-                  );
-                },
-                child: const Center(
-                  child: Text(
-                    'Save',
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
-              ),
-              singleSpace(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  final TextEditingController _passwordController = TextEditingController();
+  bool _passwordVisible = false;
 
   Column innerBody() {
     return Column(
@@ -198,6 +137,67 @@ class _NewPasswordState extends State<NewPassword> {
   Widget singleSpace() {
     return const SizedBox(
       height: 20,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              doubleSpace(),
+              Center(
+                child: Image.asset(
+                  'assets/icons/logo.png',
+                  width: 70,
+                  height: 80,
+                ),
+              ),
+              doubleSpace(),
+              const Center(
+                child: Text(
+                  'Create new password',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+              doubleSpace(),
+              innerBody(),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  minimumSize: Size(85.w, 6.h),
+                  maximumSize: Size(85.w, 6.h),
+                ),
+                onPressed: () {
+                  Get.to(
+                    () => const LoginScreen(),
+                    duration: const Duration(milliseconds: 30),
+                    transition: Transition.leftToRight,
+                  );
+                },
+                child: const Center(
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+              singleSpace(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

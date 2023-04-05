@@ -1,3 +1,4 @@
+import 'package:alarm/alarm.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,8 +20,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final TextEditingController _taskKey = TextEditingController();
+  final alarmSettings = AlarmSettings(
+    id: 42,
+    dateTime: DateTime.now(),
+    assetAudioPath: 'assets/alarm.mp3',
+    loopAudio: true,
+    vibrate: true,
+    fadeDuration: 3.0,
+    notificationTitle: 'This is the title',
+    notificationBody: 'This is the body',
+    enableNotificationOnKill: true,
+  );
+
   GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
+  TimeOfDay selectedTime = TimeOfDay.now();
+
+  final TextEditingController _taskKey = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -127,12 +142,17 @@ class _HomePageState extends State<HomePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'TASK HISTORY',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 20),
+                    InkWell(
+                      onTap: () async {
+                        // await Alarm.set(alarmSettings: alarmSettings);
+                      },
+                      child: const Text(
+                        'TASK HISTORY',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 20),
+                      ),
                     ),
                     InkWell(
                       onTap: () {
@@ -155,12 +175,17 @@ class _HomePageState extends State<HomePage> {
                   height: 163,
                 ),
                 const SizedBox(height: 40),
-                const Text(
-                  'NO TASK HISTORY',
-                  style: TextStyle(
-                      color: AppColors.appGrey,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 22),
+                InkWell(
+                  onTap: () {
+                    // _selectTime(context);
+                  },
+                  child: const Text(
+                    'NO TASK HISTORY',
+                    style: TextStyle(
+                        color: AppColors.appGrey,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 22),
+                  ),
                 ),
                 GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
@@ -172,12 +197,12 @@ class _HomePageState extends State<HomePage> {
                   ),
                   itemCount: tempTaskHistory.length,
                   itemBuilder: (BuildContext context, int index) {
-                    TaskHistory taskHistory = tempTaskHistory[index];
-                    List<String> parts = taskHistory.taskName.split(' ');
+                    TaskModel taskHistory = tempTaskHistory[index];
+                    List<String> parts = taskHistory.title!.split(' ');
                     return Container(
                         padding: const EdgeInsets.fromLTRB(14, 11, 9, 2),
                         decoration: BoxDecoration(
-                          color: taskHistory.status
+                          color: taskHistory.completedStatus!
                               ? AppColors.secondary
                               : AppColors.primary,
                           borderRadius: BorderRadius.circular(10),
@@ -221,7 +246,7 @@ class _HomePageState extends State<HomePage> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      taskHistory.createdDate,
+                                      taskHistory.createdDate.toString(),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 10,
@@ -229,7 +254,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                     Text(
-                                      taskHistory.createdTime,
+                                      taskHistory.createdTime.toString(),
                                       style: const TextStyle(
                                         fontSize: 10,
                                         color: Colors.white,
@@ -244,7 +269,7 @@ class _HomePageState extends State<HomePage> {
                               height: 15,
                             ),
                             Expanded(
-                              child: buildText(parts, taskHistory.taskName),
+                              child: buildText(parts, taskHistory.title),
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -260,13 +285,13 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       child: Icon(
                                         Icons.person,
-                                        color: taskHistory.status
+                                        color: taskHistory.completedStatus!
                                             ? AppColors.secondary
                                             : AppColors.primary,
                                       ),
                                     ),
                                     Text(
-                                      ' + ${taskHistory.userCount}',
+                                      ' + ${taskHistory.totalUsers}',
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 12,
@@ -276,7 +301,7 @@ class _HomePageState extends State<HomePage> {
                                   ],
                                 ),
                                 Text(
-                                  taskHistory.status
+                                  taskHistory.completedStatus!
                                       ? 'COMPLETED'
                                       : 'INCOMPLETED',
                                   style: const TextStyle(
@@ -416,6 +441,61 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget buildText(parts, text) {
+    if (parts.length > 1) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            parts[0],
+            style: const TextStyle(
+              color: Colors.white,
+              letterSpacing: 2,
+              fontSize: 23,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          FittedBox(
+            fit: BoxFit.contain,
+            child: Text(
+              parts.sublist(1).join(' '),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          letterSpacing: 2,
+          fontSize: 23,
+          fontWeight: FontWeight.w800,
+        ),
+      );
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+    );
+    if (picked != null && picked != selectedTime) {
+      setState(() {
+        selectedTime = picked;
+      });
+    }
+  }
+
   Container _assignTaskCircle() {
     return Container(
       decoration: const BoxDecoration(
@@ -460,48 +540,5 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-  }
-
-  Widget buildText(parts, text) {
-    if (parts.length > 1) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            parts[0],
-            style: const TextStyle(
-              color: Colors.white,
-              letterSpacing: 2,
-              fontSize: 23,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          FittedBox(
-            fit: BoxFit.contain,
-            child: Text(
-              parts.sublist(1).join(' '),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      );
-    } else {
-      return Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          letterSpacing: 2,
-          fontSize: 23,
-          fontWeight: FontWeight.w800,
-        ),
-      );
-    }
   }
 }
