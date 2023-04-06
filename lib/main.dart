@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
-import 'package:wegotask/firebase_options.dart';
+import 'firebase_options.dart';
 
 import 'common/themes.dart';
 import 'controller/general_controller.dart';

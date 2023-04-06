@@ -1,12 +1,16 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
-
 import '../../common/app_bar_widget.dart';
+import '../../common/custom_dialog.dart';
+import '../../common/custom_toast.dart';
+import '../../common/date_time_functions.dart';
 import '../../databse/collections.dart';
 import '../../databse/data_helper.dart';
+import '../../global_variables.dart';
 
 class CreateNewTask extends StatefulWidget {
   const CreateNewTask({super.key});
@@ -16,33 +20,154 @@ class CreateNewTask extends StatefulWidget {
 }
 
 class _CreateNewTaskState extends State<CreateNewTask> {
+  DateTime createdDate = DateTime.now();
+  TimeOfDay dayOfWeek = TimeOfDay.now();
   String dropdownValue = 'Item 1';
   String dropdownvaluecountry = 'Only Can View Task';
-  String dropdownvaluecountryId = '0';
-  List<String> list = <String>['Item 1', 'Item 2', 'Item 3', 'Item 4'];
-  DateTime selectedDate = DateTime.now();
+  List<String> list = <String>['Only Can View Task', 'Can Can Edit Task'];
+  bool repeatAlarm = false;
   TimeOfDay selectedTime = TimeOfDay.now();
+  bool taskPermission = false;
 
   final Color _fieldColor = const Color(0xFFEBEFF0);
   final TextEditingController _taskCreatedDate = TextEditingController();
   final TextEditingController _taskCreatedTime = TextEditingController();
+  final TextEditingController _taskDayOfWeek = TextEditingController();
   final TextEditingController _taskDesc = TextEditingController();
   final TextEditingController _taskKey = TextEditingController();
   final TextEditingController _taskTitle = TextEditingController();
   final TextEditingController _taskUser = TextEditingController();
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBarWidget(title: 'CREATE NEW TASK'),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'ADD DETAIL OF TASK',
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 10),
+              _taskInfo(),
+              const SizedBox(height: 15),
+              _inputs(),
+              const SizedBox(height: 15),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        readOnly: true,
+                        controller: _taskKey,
+                        decoration:
+                            const InputDecoration(border: InputBorder.none),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        await Clipboard.setData(
+                            ClipboardData(text: _taskKey.text));
+                        CustomToast.successToast(message: 'Copied');
+                      },
+                      child: const Icon(
+                        Icons.copy,
+                        color: Colors.black,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(height: 15),
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    minimumSize: Size(35.w, 6.h),
+                    maximumSize: Size(35.w, 6.h),
+                  ),
+                  onPressed: (_taskDesc.text.isEmpty ||
+                          _taskDayOfWeek.text.isEmpty ||
+                          _taskTitle.text.isEmpty ||
+                          _taskUser.text.isEmpty ||
+                          _taskCreatedTime.text.isEmpty ||
+                          _taskCreatedDate.text.isEmpty)
+                      ? null
+                      : () async {
+                          CustomDialogBox.showLoading('Creating Task');
+                          print('USERDATA!.ID: ${userData!.id}');
+                          String docId = DataHelper.getNewDocId();
+                          var taskModel = {
+                            '_id': docId,
+                            'creator_id': userData!.id,
+                            'created_date': _taskCreatedDate.text,
+                            'created_time': formatTimeOfDay(TimeOfDay.now()),
+                            'created_day': _taskDayOfWeek.text,
+                            'title': _taskTitle.text,
+                            'desc': _taskDesc.text,
+                            'task_permission': taskPermission,
+                            'total_users': int.parse(_taskUser.text),
+                            'active_users': 0,
+                            'completed_status': false,
+                            'alarm_time': _taskCreatedTime.text,
+                            'repeat_alarm': repeatAlarm,
+                            'users_list': [],
+                          };
+
+                          await DataHelper.addCollectionData(
+                              Collections.TASKS, docId, taskModel);
+                          _taskKey.text = docId;
+
+                          _taskDesc.text = '';
+                          _taskDayOfWeek.text = '';
+                          _taskTitle.text = '';
+                          _taskUser.text = '';
+                          _taskCreatedTime.text = '';
+                          _taskCreatedDate.text = '';
+                          CustomDialogBox.hideLoading();
+
+                          setState(() {});
+                        },
+                  child: const Center(
+                    child: Text(
+                      'Add',
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
+      initialDate: createdDate,
       firstDate: DateTime.now(),
       lastDate: DateTime(3101),
     );
-    if (picked != null && picked != selectedDate) {
+    if (picked != null && picked != createdDate) {
       setState(() {
-        selectedDate = DateTime(picked.year, picked.month, picked.day);
-
-        print('SELECTEDDATE: $selectedDate');
+        createdDate = DateTime(picked.year, picked.month, picked.day);
+        _taskDayOfWeek.text = getDayOfWeek(picked);
+        print('SELECTEDDATE: $createdDate');
         _taskCreatedDate.text = picked.toString().substring(0, 10);
       });
     }
@@ -57,6 +182,11 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       setState(() {
         selectedTime = picked;
         _taskCreatedTime.text = selectedTime.format(context).toString();
+        final dateFormat = DateFormat('h:mm a');
+        final time = dateFormat.parse(_taskCreatedTime.text);
+        print('Parsed Time: ${TimeOfDay.fromDateTime(time)}');
+        print(
+            'FORMATTIMEOFDAY(TIMEOFDAY.FROMDATETIME(TIME)): ${formatTimeOfDay(TimeOfDay.fromDateTime(time))}');
       });
     }
   }
@@ -172,22 +302,26 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                     ),
                                   ))
                               .toList(),
-                          validator: (value) {
-                            if (dropdownvaluecountry == 'Country Name') {
-                              return 'Please Select Country';
-                            }
-                            return null;
-                          },
                           onChanged: (newValue) {
                             setState(() {
                               dropdownvaluecountry = newValue.toString();
-                              dropdownvaluecountryId = newValue.toString();
+
+                              if (newValue == 'Only Can View Task') {
+                                taskPermission = false;
+                              } else {
+                                taskPermission = true;
+                              }
                             });
                           },
                           onSaved: (newValue) {
                             setState(() {
                               dropdownvaluecountry = newValue.toString();
-                              dropdownvaluecountryId = newValue.toString();
+
+                              if (newValue == 'Only Can View Task') {
+                                taskPermission = false;
+                              } else {
+                                taskPermission = true;
+                              }
                             });
                           },
                         ),
@@ -222,14 +356,17 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                     ),
                     height: 46,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: const TextField(
-                      style: TextStyle(
+                    child: TextField(
+                      controller: _taskDayOfWeek,
+                      readOnly: true,
+                      onTap: () => _selectDate(context),
+                      style: const TextStyle(
                         color: Color(0xFF1E3333),
                         fontWeight: FontWeight.w700,
                         fontSize: 15,
                       ),
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Enter Day',
                         hintStyle: TextStyle(
@@ -410,13 +547,11 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           onChanged: (newValue) {
                             setState(() {
                               dropdownvaluecountry = newValue.toString();
-                              dropdownvaluecountryId = newValue.toString();
                             });
                           },
                           onSaved: (newValue) {
                             setState(() {
                               dropdownvaluecountry = newValue.toString();
-                              dropdownvaluecountryId = newValue.toString();
                             });
                           },
                         ),
@@ -484,104 +619,6 @@ class _CreateNewTaskState extends State<CreateNewTask> {
               ),
             ),
           ]),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarWidget(title: 'CREATE NEW TASK'),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'ADD DETAIL OF TASK',
-                style:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 10),
-              _taskInfo(),
-              const SizedBox(height: 15),
-              _inputs(),
-              const SizedBox(height: 15),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _taskKey,
-                        decoration:
-                            const InputDecoration(border: InputBorder.none),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        await Clipboard.setData(
-                            ClipboardData(text: _taskKey.text));
-                        // copied successfully
-                      },
-                      child: const Icon(
-                        Icons.copy,
-                        color: Colors.black,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
-              Center(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    minimumSize: Size(35.w, 6.h),
-                    maximumSize: Size(35.w, 6.h),
-                  ),
-                  onPressed: () async {
-                    String docId = DataHelper.getNewDocId();
-                    var taskModel = {
-                      '_uid': docId,
-                      'created_date': _taskCreatedDate.text,
-                      'created_time': _taskCreatedTime.text,
-                      'title': _taskTitle.text,
-                      'desc': _taskDesc.text,
-                      'permission': true,
-                      'total_users': int.parse(_taskUser.text),
-                      'active_users': 0,
-                      'completed_status': true,
-                    };
-                    // var taskModel = TaskModel(
-                    //     _taskCreatedDate.text,
-                    //     _taskCreatedTime.text,
-                    //     _taskTitle.text,
-                    //     _taskDesc.text,
-                    //     int.parse(_taskUser.text),
-                    //     false);
-                    await DataHelper.addCollectionData(
-                        Collections.TASKS, docId, taskModel);
-                  },
-                  child: const Center(
-                    child: Text(
-                      'Add',
-                      style: TextStyle(
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
