@@ -20,7 +20,7 @@ class CreateNewTask extends StatefulWidget {
 }
 
 class _CreateNewTaskState extends State<CreateNewTask> {
-  DateTime createdDate = DateTime.now();
+  DateTime endDate = DateTime.now();
   TimeOfDay dayOfWeek = TimeOfDay.now();
   String dropdownValue = 'Item 1';
   String dropdownvaluecountry = 'Only Can View Task';
@@ -30,8 +30,8 @@ class _CreateNewTaskState extends State<CreateNewTask> {
   bool taskPermission = false;
 
   final Color _fieldColor = const Color(0xFFEBEFF0);
-  final TextEditingController _taskCreatedDate = TextEditingController();
-  final TextEditingController _taskCreatedTime = TextEditingController();
+  final TextEditingController _taskendDate = TextEditingController();
+  final TextEditingController _taskendTime = TextEditingController();
   final TextEditingController _taskDayOfWeek = TextEditingController();
   final TextEditingController _taskDesc = TextEditingController();
   final TextEditingController _taskKey = TextEditingController();
@@ -101,26 +101,26 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           _taskDayOfWeek.text.isEmpty ||
                           _taskTitle.text.isEmpty ||
                           _taskUser.text.isEmpty ||
-                          _taskCreatedTime.text.isEmpty ||
-                          _taskCreatedDate.text.isEmpty)
+                          _taskendTime.text.isEmpty ||
+                          _taskendDate.text.isEmpty)
                       ? null
                       : () async {
                           CustomDialogBox.showLoading('Creating Task');
                           print('USERDATA!.ID: ${userData!.id}');
                           String docId = DataHelper.getNewDocId();
                           var taskModel = {
-                            '_id': docId,
+                            'id': docId,
                             'creator_id': userData!.id,
-                            'created_date': _taskCreatedDate.text,
-                            'created_time': formatTimeOfDay(TimeOfDay.now()),
-                            'created_day': _taskDayOfWeek.text,
+                            'end_date': _taskendDate.text,
+                            'end_time': formatTimeOfDay(TimeOfDay.now()),
+                            'end_day': _taskDayOfWeek.text,
                             'title': _taskTitle.text,
                             'desc': _taskDesc.text,
                             'task_permission': taskPermission,
                             'total_users': int.parse(_taskUser.text),
                             'active_users': 0,
                             'completed_status': false,
-                            'alarm_time': _taskCreatedTime.text,
+                            'alarm_time': _taskendTime.text,
                             'repeat_alarm': repeatAlarm,
                             'users_list': [],
                           };
@@ -129,12 +129,16 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                               Collections.TASKS, docId, taskModel);
                           _taskKey.text = docId;
 
+                          await Clipboard.setData(
+                              ClipboardData(text: _taskKey.text));
+                          CustomToast.successToast(message: 'Task Key is Copied');
+
                           _taskDesc.text = '';
                           _taskDayOfWeek.text = '';
                           _taskTitle.text = '';
                           _taskUser.text = '';
-                          _taskCreatedTime.text = '';
-                          _taskCreatedDate.text = '';
+                          _taskendTime.text = '';
+                          _taskendDate.text = '';
                           CustomDialogBox.hideLoading();
 
                           setState(() {});
@@ -159,16 +163,16 @@ class _CreateNewTaskState extends State<CreateNewTask> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: createdDate,
+      initialDate: endDate,
       firstDate: DateTime.now(),
       lastDate: DateTime(3101),
     );
-    if (picked != null && picked != createdDate) {
+    if (picked != null && picked != endDate) {
       setState(() {
-        createdDate = DateTime(picked.year, picked.month, picked.day);
+        endDate = DateTime(picked.year, picked.month, picked.day);
         _taskDayOfWeek.text = getDayOfWeek(picked);
-        print('SELECTEDDATE: $createdDate');
-        _taskCreatedDate.text = picked.toString().substring(0, 10);
+        print('SELECTEDDATE: $endDate');
+        _taskendDate.text = picked.toString().substring(0, 10);
       });
     }
   }
@@ -181,9 +185,9 @@ class _CreateNewTaskState extends State<CreateNewTask> {
     if (picked != null && picked != selectedTime) {
       setState(() {
         selectedTime = picked;
-        _taskCreatedTime.text = selectedTime.format(context).toString();
+        _taskendTime.text = selectedTime.format(context).toString();
         final dateFormat = DateFormat('h:mm a');
-        final time = dateFormat.parse(_taskCreatedTime.text);
+        final time = dateFormat.parse(_taskendTime.text);
         print('Parsed Time: ${TimeOfDay.fromDateTime(time)}');
         print(
             'FORMATTIMEOFDAY(TIMEOFDAY.FROMDATETIME(TIME)): ${formatTimeOfDay(TimeOfDay.fromDateTime(time))}');
@@ -403,7 +407,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                     height: 46,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: TextField(
-                      controller: _taskCreatedDate,
+                      controller: _taskendDate,
                       onTap: () => _selectDate(context),
                       readOnly: true,
                       style: const TextStyle(
@@ -452,7 +456,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: TextField(
                       onTap: () => _selectTime(context),
-                      controller: _taskCreatedTime,
+                      controller: _taskendTime,
                       readOnly: true,
                       style: const TextStyle(
                         color: Color(0xFF1E3333),

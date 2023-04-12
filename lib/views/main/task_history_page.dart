@@ -142,7 +142,7 @@ class _TaskHistoryPageState extends State<TaskHistoryPage> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              taskHistory.createdDate.toString(),
+                              taskHistory.endDate.toString(),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 10,
@@ -150,7 +150,7 @@ class _TaskHistoryPageState extends State<TaskHistoryPage> {
                               ),
                             ),
                             Text(
-                              taskHistory.createdTime.toString(),
+                              taskHistory.endTime.toString(),
                               style: const TextStyle(
                                 fontSize: 10,
                                 color: Colors.white,

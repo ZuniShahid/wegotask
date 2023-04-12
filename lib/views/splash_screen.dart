@@ -28,7 +28,8 @@ class _SplashScreenState extends State<SplashScreen> {
   _navigate() async {
     bool isLoggedIn = await getUserLoggedIn();
     var id = await getUserUID();
-    var status = await AuthHelper.fetchUser(Collections.USERS, id);
+    print('ID: $id');
+    var status = await AuthHelper.fetchUser(Collections.USERS, 'MgijLVx51rP8WmLJOnCFQutupnz2');
     if (isLoggedIn && status) {
       Future.delayed(const Duration(milliseconds: 2000), () {
         Get.offAll(() => const HomePage());

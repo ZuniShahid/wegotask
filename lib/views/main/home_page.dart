@@ -8,6 +8,8 @@ import 'package:sizer/sizer.dart';
 import '../../common/colors.dart';
 import '../../common/gradient_text.dart';
 import '../../common/input_decorations.dart';
+import '../../databse/collections.dart';
+import '../../databse/data_helper.dart';
 import '../../models/task_history_model.dart';
 import 'create_new_task.dart';
 import 'task_history_page.dart';
@@ -126,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                           onChanged: (value) {
                             setState(() {});
                           },
-                          // controller: idController,
+                          controller: _taskKey,
                           cursorColor: Colors.grey,
                           decoration: InputDecorations.inputDecorationAllBorder(
                             hintText: 'Paste Code Here',
@@ -138,6 +140,12 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
+                ElevatedButton(
+                    onPressed: () {
+                      DataHelper.searchTaskFromCollection(
+                          Collections.TASKS, 'id', _taskKey.text.trim());
+                    },
+                    child: const Text('Submit')),
                 const SizedBox(height: 40),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -246,7 +254,7 @@ class _HomePageState extends State<HomePage> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      taskHistory.createdDate.toString(),
+                                      taskHistory.endDate.toString(),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 10,
@@ -254,7 +262,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                     Text(
-                                      taskHistory.createdTime.toString(),
+                                      taskHistory.endTime.toString(),
                                       style: const TextStyle(
                                         fontSize: 10,
                                         color: Colors.white,

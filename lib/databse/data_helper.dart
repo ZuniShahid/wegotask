@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../controller/general_controller.dart';
+import '../global_variables.dart';
+import '../models/task_history_model.dart';
 import 'collections.dart';
 import '../models/user_model.dart';
 
@@ -193,6 +195,63 @@ class DataHelper {
         .where(key, isLessThanOrEqualTo: '$value\uf8ff')
         .get();
     return documents.docs;
+  }
+
+  static fetchTaskFromId(String id) async {
+    var userDoc =
+        await FirebaseFirestore.instance.collection('tasks').doc(id).get();
+    TaskModel task = TaskModel.fromJson(userDoc.data()!);
+    if (task.totalUsers == task.activeUsers) {
+      return 'Task User Limit is Full';
+    }
+    if (task.creatorId == userData!.id) {
+      return 'You are the Creator of this Task.';
+    }
+    for (int i = 0; i < task.usersList!.length; i++) {
+      var taskId = task.usersList![i];
+      if (taskId.toString() == userData!.id.toString()) {
+        return 'You are already added';
+      }
+    }
+    updateQuery(Collections.TASKS, task.id.toString(), 'activeUser',
+        task.activeUsers! + 1);
+    updateQuery(Collections.TASKS, task.id.toString(), 'usersList',
+        task.activeUsers! + 1);
+
+    return task;
+  }
+
+  static searchTaskFromCollection(
+      var collection, String key, String value) async {
+    var documents =
+        await collection.where(key, isEqualTo: value).limit(1).get();
+
+    if (documents.docs.isNotEmpty) {
+      TaskModel task = TaskModel.fromJson(documents.docs[0].data()!);
+      if (task.totalUsers == task.activeUsers) {
+        return 'Task User Limit is Full';
+      }
+      if (task.creatorId == userData!.id) {
+        print('You are the Creator of this Task.');
+        return 'You are the Creator of this Task.';
+      }
+      for (int i = 0; i < task.usersList!.length; i++) {
+        var taskId = task.usersList![i];
+        if (taskId.toString() == userData!.id.toString()) {
+          print('You are already added');
+          return 'You are already added';
+        }
+      }
+      updateQuery(Collections.TASKS, task.id.toString(), 'activeUser',
+          task.activeUsers! + 1);
+      collection.doc(task.id).set({
+        'users_list': FieldValue.arrayUnion([userData!.id])
+      }, SetOptions(merge: true));
+      print('You are added in Task');
+      return 'You are added in Task';
+    } else {
+      print('Task not found');
+    }
   }
 
   static sendNotification(var map, var data, var userId) async {

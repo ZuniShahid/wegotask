@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import 'message_model.dart';
+
 class TaskModel {
   TaskModel({
     this.id,
     this.creatorId,
-    this.createdDate,
-    this.createdTime,
-    this.createdDay,
+    this.endDate,
+    this.endTime,
+    this.endDay,
     this.title,
     this.desc,
     this.taskPermission,
@@ -16,13 +18,14 @@ class TaskModel {
     this.alarmTime,
     this.repeatAlarm,
     this.usersList,
+    this.messageModelList,
   });
 
   String? id;
   String? creatorId;
-  String? createdDate;
-  String? createdTime;
-  String? createdDay;
+  String? endDate;
+  String? endTime;
+  String? endDay;
   String? title;
   String? desc;
   bool? taskPermission;
@@ -32,13 +35,14 @@ class TaskModel {
   String? alarmTime;
   bool? repeatAlarm;
   List<String>? usersList;
+  List<MessageModel>? messageModelList;
 
   factory TaskModel.fromJson(Map<String, dynamic> json) => TaskModel(
         id: json["id"],
         creatorId: json["creator_id"],
-        createdDate: json["created_date"],
-        createdTime: json["created_time"],
-        createdDay: json["created_day"],
+        endDate: json["end_date"],
+        endTime: json["end_time"],
+        endDay: json["end_day"],
         title: json["title"],
         desc: json["desc"],
         taskPermission: json["task_permission"],
@@ -53,9 +57,9 @@ class TaskModel {
   Map<String, dynamic> toJson() => {
         "id": id,
         "creator_id": creatorId,
-        "created_date": createdDate,
-        "created_time": createdTime,
-        "created_day": createdDay,
+        "end_date": endDate,
+        "end_time": endTime,
+        "end_day": endDay,
         "title": title,
         "desc": desc,
         "task_permission": taskPermission,
@@ -70,40 +74,40 @@ class TaskModel {
 
 List<TaskModel> tempTaskHistory = [
   TaskModel(
-      createdDate: DateTime.now().toString().substring(0, 10),
-      createdTime: TimeOfDay.now().toString().substring(0, 10),
+      endDate: DateTime.now().toString().substring(0, 10),
+      endTime: TimeOfDay.now().toString().substring(0, 10),
       title: 'UTLITIES BILLS & FILLING GAS',
       desc:
           'Shopping utilties item then pay the Internet Bills and at last Fill Gas in calander from Gas Station.',
       totalUsers: 03,
       completedStatus: true),
   TaskModel(
-      createdDate: DateTime.now().toString().substring(0, 10),
-      createdTime: TimeOfDay.now().toString().substring(0, 10),
+      endDate: DateTime.now().toString().substring(0, 10),
+      endTime: TimeOfDay.now().toString().substring(0, 10),
       title: 'UTLITIES BILLS & FILLING GAS',
       desc:
           'Shopping utilties item then pay the Internet Bills and at last Fill Gas in calander from Gas Station.',
       totalUsers: 03,
       completedStatus: true),
   TaskModel(
-      createdDate: DateTime.now().toString().substring(0, 10),
-      createdTime: TimeOfDay.now().toString().substring(0, 10),
+      endDate: DateTime.now().toString().substring(0, 10),
+      endTime: TimeOfDay.now().toString().substring(0, 10),
       title: 'UTLITIES BILLS & FILLING GAS',
       desc:
           'Shopping utilties item then pay the Internet Bills and at last Fill Gas in calander from Gas Station.',
       totalUsers: 03,
       completedStatus: true),
   TaskModel(
-      createdDate: DateTime.now().toString().substring(0, 10),
-      createdTime: TimeOfDay.now().toString().substring(0, 10),
+      endDate: DateTime.now().toString().substring(0, 10),
+      endTime: TimeOfDay.now().toString().substring(0, 10),
       title: 'UTLITIES BILLS & FILLING GAS',
       desc:
           'Shopping utilties item then pay the Internet Bills and at last Fill Gas in calander from Gas Station.',
       totalUsers: 03,
       completedStatus: true),
   TaskModel(
-      createdDate: DateTime.now().toString().substring(0, 10),
-      createdTime: TimeOfDay.now().toString().substring(0, 10),
+      endDate: DateTime.now().toString().substring(0, 10),
+      endTime: TimeOfDay.now().toString().substring(0, 10),
       title: 'UTLITIES BILLS & FILLING GAS',
       desc:
           'Shopping utilties item then pay the Internet Bills and at last Fill Gas in calander from Gas Station.',
