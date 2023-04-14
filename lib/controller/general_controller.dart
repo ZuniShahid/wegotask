@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import '../databse/collections.dart';
+import '../models/task_history_model.dart';
 
 class GeneralController extends GetxController {
   RxInt isUploaded = 0.obs;
@@ -15,6 +16,7 @@ class GeneralController extends GetxController {
   RxString FCM_TOKEN = ''.obs;
   RxString LOGIN_TYPE = ''.obs;
   RxInt TOTAL_PRODUCTS = 0.obs;
+  RxList<TaskModel> taskList = <TaskModel>[].obs;
 
   @override
   void onInit() {

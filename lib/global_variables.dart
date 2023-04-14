@@ -3,12 +3,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
 UserModel userSignUp = UserModel(
-    id: "newUserSignUpId",
-    name: "",
-    email: "",
-    lastName: "",
-    loginType: 'app',
-    contact: "",);
+  id: "newUserSignUpId",
+  name: "",
+  email: "",
+  lastName: "",
+  loginType: 'app',
+  contact: "",
+  fcmToken: '',
+);
 UserModel? userData;
 
 void setUserLoggedIn(bool key) async {
@@ -32,4 +34,3 @@ Future getUserUID() async {
   String result = pref.getString("userId") ?? '';
   return result;
 }
-

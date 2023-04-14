@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import 'message_model.dart';
 
 class TaskModel {
@@ -17,8 +15,11 @@ class TaskModel {
     this.completedStatus,
     this.alarmTime,
     this.repeatAlarm,
+    this.repeatInterval,
     this.usersList,
+    this.fcmTokenList,
     this.messageModelList,
+    this.activeUserTaskStatus,
   });
 
   String? id;
@@ -33,9 +34,12 @@ class TaskModel {
   int? activeUsers;
   bool? completedStatus;
   String? alarmTime;
+  String? repeatInterval;
   bool? repeatAlarm;
   List<String>? usersList;
+  List<String?>? fcmTokenList;
   List<MessageModel>? messageModelList;
+  List<ActiveUserTaskStatus>? activeUserTaskStatus;
 
   factory TaskModel.fromJson(Map<String, dynamic> json) => TaskModel(
         id: json["id"],
@@ -51,7 +55,17 @@ class TaskModel {
         completedStatus: json["completed_status"],
         alarmTime: json["alarm_time"],
         repeatAlarm: json["repeat_alarm"],
-        usersList: List<String>.from(json["users_list"].map((x) => x)),
+        repeatInterval: json["repeat_interval"],
+        usersList: json["users_list"] == null
+            ? []
+            : List<String>.from(json["users_list"].map((x) => x)),
+        fcmTokenList: json["fcm_token_list"] == null
+            ? <String>[]
+            : List<String>.from(json["fcm_token_list"].map((x) => x)),
+        activeUserTaskStatus: json["active_user_task_status"] == null
+            ? []
+            : List<ActiveUserTaskStatus>.from(json["active_user_task_status"]
+                .map((x) => ActiveUserTaskStatus.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -68,49 +82,29 @@ class TaskModel {
         "completed_status": completedStatus,
         "alarm_time": alarmTime,
         "repeat_alarm": repeatAlarm,
+        "repeat_interval": repeatInterval,
         "users_list": List<dynamic>.from(usersList!.map((x) => x)),
+        "fcm_token_list": List<dynamic>.from(fcmTokenList!.map((x) => x)),
       };
 }
 
-List<TaskModel> tempTaskHistory = [
-  TaskModel(
-      endDate: DateTime.now().toString().substring(0, 10),
-      endTime: TimeOfDay.now().toString().substring(0, 10),
-      title: 'UTLITIES BILLS & FILLING GAS',
-      desc:
-          'Shopping utilties item then pay the Internet Bills and at last Fill Gas in calander from Gas Station.',
-      totalUsers: 03,
-      completedStatus: true),
-  TaskModel(
-      endDate: DateTime.now().toString().substring(0, 10),
-      endTime: TimeOfDay.now().toString().substring(0, 10),
-      title: 'UTLITIES BILLS & FILLING GAS',
-      desc:
-          'Shopping utilties item then pay the Internet Bills and at last Fill Gas in calander from Gas Station.',
-      totalUsers: 03,
-      completedStatus: true),
-  TaskModel(
-      endDate: DateTime.now().toString().substring(0, 10),
-      endTime: TimeOfDay.now().toString().substring(0, 10),
-      title: 'UTLITIES BILLS & FILLING GAS',
-      desc:
-          'Shopping utilties item then pay the Internet Bills and at last Fill Gas in calander from Gas Station.',
-      totalUsers: 03,
-      completedStatus: true),
-  TaskModel(
-      endDate: DateTime.now().toString().substring(0, 10),
-      endTime: TimeOfDay.now().toString().substring(0, 10),
-      title: 'UTLITIES BILLS & FILLING GAS',
-      desc:
-          'Shopping utilties item then pay the Internet Bills and at last Fill Gas in calander from Gas Station.',
-      totalUsers: 03,
-      completedStatus: true),
-  TaskModel(
-      endDate: DateTime.now().toString().substring(0, 10),
-      endTime: TimeOfDay.now().toString().substring(0, 10),
-      title: 'UTLITIES BILLS & FILLING GAS',
-      desc:
-          'Shopping utilties item then pay the Internet Bills and at last Fill Gas in calander from Gas Station.',
-      totalUsers: 03,
-      completedStatus: true),
-];
+class ActiveUserTaskStatus {
+  ActiveUserTaskStatus({
+    this.uid,
+    this.taskStatus,
+  });
+
+  String? uid;
+  bool? taskStatus;
+
+  factory ActiveUserTaskStatus.fromJson(Map<String, dynamic> json) =>
+      ActiveUserTaskStatus(
+        uid: json["_uid"],
+        taskStatus: json["task_status"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_uid": uid,
+        "task_status": taskStatus,
+      };
+}

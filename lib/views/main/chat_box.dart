@@ -1,98 +1,38 @@
 import 'package:chat_bubbles/chat_bubbles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:wegotask/databse/data_helper.dart';
+import 'package:wegotask/global_variables.dart';
+import 'package:wegotask/models/message_model.dart';
 
 import '../../common/colors.dart';
 import '../../common/input_decorations.dart';
+import '../../models/task_history_model.dart';
 
 class ChatBox extends StatefulWidget {
-  const ChatBox({Key? key}) : super(key: key);
+  final TaskModel taskModel;
+  const ChatBox({Key? key, required this.taskModel}) : super(key: key);
 
   @override
   State<ChatBox> createState() => _ChatBoxState();
 }
 
 class _ChatBoxState extends State<ChatBox> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          children: const [
-            Text(
-              'Houcine Ncib',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                fontFamily: 'Lato',
-                color: Colors.black,
-              ),
-            ),
-            Text(
-              'Online',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                fontFamily: 'Lato',
-                color: AppColors.secondary,
-              ),
-            ),
-          ],
-        ),
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-        backgroundColor: AppColors.chatColor,
-      ),
-      body: const ChatScreen(),
-    );
-  }
-}
-
-class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
-
-  @override
-  State<ChatScreen> createState() => _ChatScreenState();
-}
-
-class _ChatScreenState extends State<ChatScreen> {
-  final int reciveCount = 8;
-  final int sendCount = 8;
-
   final TextEditingController _typeMessageController = TextEditingController();
 
-  getTitleText(String title) => Text(
-        title,
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-        ),
-      );
-
-  getSenderView(String text) => Container(
+  getSenderView(MessageModel message) => Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              children: [
-                const SizedBox(
-                  height: 25,
-                ),
-                Image.asset(
-                  'assets/icons/double_tick.png',
-                  width: 14,
-                  height: 8,
-                ),
-              ],
-            ),
             const SizedBox(
               width: 5,
             ),
             Expanded(
               child: BubbleSpecialOne(
-                text: text,
+                text: message.messageText!,
                 isSender: true,
                 color: AppColors.chatColor,
                 textStyle: const TextStyle(
@@ -107,7 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       );
 
-  getReceiverView(String text) => Container(
+  getReceiverView(MessageModel message) => Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -118,7 +58,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     AssetImage('assets/icons/no_task_history.png')),
             Expanded(
               child: BubbleSpecialOne(
-                text: text,
+                text: message.messageText!,
                 isSender: false,
                 color: AppColors.chatColor,
                 textStyle: const TextStyle(
@@ -129,18 +69,6 @@ class _ChatScreenState extends State<ChatScreen> {
             const SizedBox(
               width: 5,
             ),
-            Column(
-              children: [
-                const SizedBox(
-                  height: 25,
-                ),
-                Image.asset(
-                  'assets/icons/double_tick.png',
-                  width: 14,
-                  height: 8,
-                ),
-              ],
-            ),
           ],
         ),
       );
@@ -148,96 +76,158 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    return Stack(children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
-        child: ListView(
-          children: <Widget>[
-            Center(
-              child: DateChip(
-                color: Colors.transparent,
-                date: DateTime(now.year, now.month, now.day - 1),
-              ),
+
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Chat',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+              fontFamily: 'Lato',
+              color: Colors.black,
             ),
-            ListView.builder(
-              itemCount: 20,
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemBuilder: (BuildContext context, int index) {
-                return index % 2 == 0
-                    ? getSenderView(
-                        'hello mike, you need ac spit mitsudis.....???. i have best deal for you. ')
-                    : getReceiverView(
-                        'hello mike, you need ac spit mitsudis.....???. i have best deal for you. ');
-              },
-            ),
-          ],
+          ),
+          automaticallyImplyLeading: true,
+          centerTitle: true,
+          backgroundColor: AppColors.chatColor,
         ),
-      ),
-      Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            height: 64,
-            width: 100.w,
-            color: Colors.white,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: AppColors.textFieldColor,
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Icon(
-                          Icons.keyboard,
-                          color: _typeMessageController.text == ''
-                              ? AppColors.appGrey
-                              : Colors.black,
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          child: TextFormField(
-                            onChanged: (value) {
-                              setState(() {});
-                            },
-                            controller: _typeMessageController,
-                            // validator: (value) => CustomValidator.email(value),
-                            cursorColor: Colors.grey,
-                            decoration:
-                                InputDecorations.inputDecorationAllBorder(
-                              hintText: 'type your text here....'.toUpperCase(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+        body: Stack(children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
+            child: ListView(
+              children: <Widget>[
+                Center(
+                  child: DateChip(
+                    color: Colors.transparent,
+                    date: DateTime.now(),
                   ),
                 ),
-                const SizedBox(
-                  width: 13,
-                ),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.rectangle, color: Colors.black),
-                  child: Transform.rotate(
-                    angle: _typeMessageController.text.isNotEmpty ? 5.5 : 0,
-                    child: const Icon(
-                      Icons.send,
-                      color: Colors.white,
-                    ),
-                  ),
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('tasks')
+                      .doc(widget.taskModel.id)
+                      .collection('messages')
+                      .orderBy('created_at', descending: true)
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const SizedBox(
+                          height: 10,
+                          width: 10,
+                          child: CircularProgressIndicator());
+                    }
+
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return const Text('No messages found.');
+                    }
+
+                    return ListView.builder(
+                      itemCount: snapshot.data?.docs.length,
+                      shrinkWrap: true,
+                      reverse: true,
+                      itemBuilder: (BuildContext context, int index) {
+                        var data = snapshot.data!.docs[index].data();
+                        MessageModel message =
+                            MessageModel.fromJson(data as Map<String, dynamic>);
+
+                        return message.senderId == userData!.id
+                            ? getSenderView(message)
+                            : getReceiverView(message);
+                      },
+                    );
+                  },
                 ),
               ],
             ),
-          )),
-    ]);
+          ),
+          Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                height: 74,
+                width: 100.w,
+                color: Colors.white,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: AppColors.textFieldColor,
+                        ),
+                        child: Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            Icon(
+                              Icons.keyboard,
+                              color: _typeMessageController.text == ''
+                                  ? AppColors.appGrey
+                                  : Colors.black,
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                controller: _typeMessageController,
+                                cursorColor: Colors.grey,
+                                decoration:
+                                    InputDecorations.inputDecorationAllBorder(
+                                  hintText:
+                                      'type your text here....'.toUpperCase(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 13,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                          shape: BoxShape.rectangle, color: Colors.black),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (_typeMessageController.text.isNotEmpty) {
+                            sendMessage(_typeMessageController.text);
+                            _typeMessageController.clear();
+                          }
+                        },
+                        child: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ]));
+  }
+
+  void sendMessage(String message) {
+    String newDocId = DataHelper.getNewDocId();
+    FirebaseFirestore.instance
+        .collection('tasks')
+        .doc(widget.taskModel.id)
+        .collection('messages')
+        .doc(newDocId)
+        .set({
+      "_id": newDocId,
+      "message": message,
+      "sender_id": userData!.id,
+      "image": "",
+      'created_at': DateTime.now()
+    });
   }
 }

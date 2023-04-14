@@ -17,6 +17,7 @@ class UserModel {
     this.password = '',
     required this.loginType,
     required this.contact,
+    required this.fcmToken,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
@@ -26,6 +27,7 @@ class UserModel {
         lastName: json["last_name"],
         loginType: json["login_type"] ?? '',
         contact: json["contact"],
+        fcmToken: json["fcm_token"] ?? '',
       );
 
   String contact;
@@ -35,6 +37,7 @@ class UserModel {
   String loginType;
   String name;
   String password;
+  String fcmToken;
 
   Map<String, dynamic> toJson() => {
         "_id": id,
@@ -42,5 +45,6 @@ class UserModel {
         "email": email,
         "last_name": lastName,
         "contact": contact.trim(),
+        "fcm_token": fcmToken.trim(),
       };
 }

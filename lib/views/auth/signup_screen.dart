@@ -7,14 +7,17 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../common/colors.dart';
+import '../../common/custom_dialog.dart';
 import '../../common/custom_validators.dart';
 import '../../common/input_decorations.dart';
 import '../../components/account_exists_check.dart';
+import '../../controller/general_controller.dart';
 import '../../databse/auth_helper.dart';
 import '../../databse/collections.dart';
 import '../../databse/data_helper.dart';
 import '../../global_variables.dart';
 import '../main/home_page.dart';
+import 'otp_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -43,6 +46,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget phoneNumberField() {
     return InternationalPhoneNumberInput(
       onInputChanged: (PhoneNumber number) {
+        var countryCode = number.dialCode.toString();
+        _phoneController.text = countryCode + _phoneController.text.trim();
+        if (number.phoneNumber!.isNotEmpty) {
+          if (_phoneController.text[0] == "0") {
+            setState(() {
+              _phoneController.text = "";
+            });
+          }
+        }
         setState(() {});
       },
       onInputValidated: (bool value) {
@@ -106,10 +118,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() {
       loader = true;
     });
+    CustomDialogBox.showLoading('Sending OTP');
     userSignUp.name = _firstNameController.text;
     userSignUp.lastName = _lastNameController.text;
     userSignUp.email = _emailController.text.trim();
     userSignUp.password = _passwordController.text;
+    userSignUp.contact = _phoneController.text.trim();
+    userSignUp.fcmToken = Get.find<GeneralController>().FCM_TOKEN.value;
     bool uniqueUsername = await AuthHelper.checkUniqueness(
         'email', _emailController.text, Collections.USERS);
     if (uniqueUsername) {
@@ -117,15 +132,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'name', _firstNameController.text, Collections.USERS);
       if (uniqueEmail) {
         bool isUnique = await AuthHelper.checkUniqueness(
-            'contact', 'userSignUp.contact', Collections.USERS);
+            'contact', _phoneController.text.trim(), Collections.USERS);
         if (isUnique) {
-          setState(() {
-            loader = false;
-          });
-          registerUser();
+          CustomDialogBox.hideLoading();
+
+          // registerUser();
+          Get.to(OTPScreen(
+            phoneNumber: _phoneController.text.trim(),
+          ));
         } else {
           setState(() {
-            loader = false;
+            CustomDialogBox.hideLoading();
           });
           AwesomeDialog(
             context: context,
@@ -139,7 +156,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         }
       } else {
         setState(() {
-          loader = false;
+          CustomDialogBox.hideLoading();
         });
         AwesomeDialog(
           context: context,
@@ -153,7 +170,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
     } else {
       setState(() {
-        loader = false;
+        CustomDialogBox.hideLoading();
       });
       AwesomeDialog(
         context: context,

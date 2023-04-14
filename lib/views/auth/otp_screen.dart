@@ -1,10 +1,17 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:sizer/sizer.dart';
-import 'new_password.dart';
+import '../../common/custom_dialog.dart';
+import '../../databse/auth_helper.dart';
+import '../../databse/collections.dart';
+import '../../databse/data_helper.dart';
+import '../../global_variables.dart';
+import '../main/home_page.dart';
 
 import '../../common/colors.dart';
 
@@ -22,10 +29,15 @@ class _OTPScreenState extends State<OTPScreen> {
   String error = "";
   // final FirebaseAuth _auth = FirebaseAuth.instance;
   StreamController<ErrorAnimationType>? errorController;
+  bool readOnlyField = true;
 
   final formKey = GlobalKey<FormState>();
   bool hasError = false;
+  bool showOtpFields = false;
   bool loader = false;
+  PhoneNumber number = PhoneNumber();
+  String countryCode = "";
+  String newVerificationId = '';
   bool resendLoader = false;
   TextEditingController textEditingController = TextEditingController();
 
@@ -51,37 +63,43 @@ class _OTPScreenState extends State<OTPScreen> {
     });
   }
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   sendOTP() {
-    // _auth.verifyPhoneNumber(
-    //     phoneNumber: widget.phoneNumber,
-    //     timeout: const Duration(seconds: 60),
-    //     verificationCompleted: (AuthCredential authCredential) {
-    //       print("verificationCompleted");
-    //       print(authCredential);
-    //     },
-    //     verificationFailed: (authException) {
-    //       print("verificationFailed");
-    //       print(authException.message);
-    //       Get.snackbar("Error", authException.message!);
-    //       setState(() {
-    //         _counter = 60;
-    //         resendLoader = false;
-    //       });
-    //       startTimer();
-    //     },
-    //     codeSent: (String verificationId, int? token) {
-    //       print("code sent");
-    //       Get.snackbar("Code Sent", "");
-    //       setState(() {
-    //         _counter = 60;
-    //         resendLoader = false;
-    //       });
-    //       startTimer();
-    //     },
-    //     codeAutoRetrievalTimeout: (String verificationId) {
-    //       print("Timout");
-    //       print(verificationId);
-    //     });
+    _auth.verifyPhoneNumber(
+        phoneNumber: '+923227501415',
+        timeout: const Duration(seconds: 60),
+        verificationCompleted: (AuthCredential authCredential) {
+          print("verificationCompleted");
+          print(authCredential);
+        },
+        verificationFailed: (authException) {
+          print("verificationFailed");
+          print(authException.message);
+          Get.snackbar("Error", authException.message!);
+          setState(() {
+            _counter = 60;
+            resendLoader = false;
+          });
+          startTimer();
+        },
+        codeSent: (String verificationId, int? token) {
+          print("code sent");
+          Get.snackbar("Code Sent", "");
+          setState(() {
+            newVerificationId = verificationId;
+            loader = false;
+            showOtpFields = true;
+            readOnlyField = false;
+            _counter = 60;
+            resendLoader = false;
+          });
+          startTimer();
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          print("Timout");
+          print(verificationId);
+        });
   }
 
   @override
@@ -142,7 +160,7 @@ class _OTPScreenState extends State<OTPScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    length: 4,
+                    length: 6,
                     obscureText: false,
                     blinkWhenObscuring: true,
                     animationType: AnimationType.fade,
@@ -158,8 +176,8 @@ class _OTPScreenState extends State<OTPScreen> {
                       inactiveColor: Colors.transparent,
                       inactiveFillColor: Colors.transparent,
                       borderRadius: BorderRadius.circular(15),
-                      fieldHeight: 55.w / 4,
-                      fieldWidth: 55.w / 4,
+                      fieldHeight: 55.w / 6,
+                      fieldWidth: 55.w / 6,
                     ),
                     cursorColor: Colors.white,
                     animationDuration: const Duration(milliseconds: 300),
@@ -234,6 +252,7 @@ class _OTPScreenState extends State<OTPScreen> {
                                 resendLoader = true;
                               });
                               print("sending again");
+
                               sendOTP();
                             }
                           },
@@ -257,58 +276,14 @@ class _OTPScreenState extends State<OTPScreen> {
                   maximumSize: Size(85.w, 6.h),
                 ),
                 onPressed: () {
-                  Get.to(() => const NewPassword(), duration: const Duration(milliseconds: 30),
-                          transition: Transition.leftToRight,);
-                  //       formKey.currentState!.validate();
-                  // if (currentText.length != 6) {
-                  //   errorController!.add(ErrorAnimationType.shake);
-                  //   setState(() {
-                  //     hasError = true;
-                  //     error = " Invalid OTP";
-                  //   });
-                  // } else {
-                  //   setState(
-                  //     () {
-                  //       loader = true;
-                  //       hasError = false;
-                  //     },
-                  //   );
-                  //   var credential = PhoneAuthProvider.credential(
-                  //       verificationId: widget.verificationId,
-                  //       smsCode: currentText);
-                  //   print("credential");
-                  //   print(credential);
-                  //   try {
-                  //     var userCred = await _auth
-                  //         .signInWithCredential(PhoneAuthProvider.credential(
-                  //       verificationId: widget.verificationId,
-                  //       smsCode: currentText,
-                  //     ));
-                  //     print("userCred");
-                  //     print(userCred.additionalUserInfo!.isNewUser);
-                  //     print('OTP Verified');
-                  //   } catch (e) {
-                  //     if (e.toString().contains('invalid')) {
-                  //       error = "Invalid code";
-                  //     } else if (e.toString().contains('expired')) {
-                  //       error = "Code is expired";
-                  //     }
-                  //     Get.snackbar("Error", error);
-                  //   }
-                  //   setState(() {
-                  //     loader = false;
-                  //   });
-                  //   if (error == "") {
-                  //     if (widget.fromForgotPass) {
-                  //       pageNavigationTo(PasswordsScreen(
-                  //         fromForgotPass: true,
-                  //         contact: widget.phoneNumber,
-                  //       ));
-                  //     } else {
-                  //       pageNavigationOff(UploadImage());
-                  //     }
-                  //   }
-                  // }
+                  CustomDialogBox.showLoading('Verifying OTP');
+
+                  // Get.to(
+                  //   () => const NewPassword(),
+                  //   duration: const Duration(milliseconds: 30),
+                  //   transition: Transition.leftToRight,
+                  // );
+                  registerUser();
                 },
                 child: loader == true
                     ? const CircularProgressIndicator.adaptive()
@@ -323,5 +298,35 @@ class _OTPScreenState extends State<OTPScreen> {
         ),
       ),
     );
+  }
+
+  registerUser() async {
+    final result = await AuthHelper.signUp(Collections.USERS);
+    if (result == 'true') {
+      var status = await AuthHelper.login(
+          Collections.USERS, userSignUp.email, userSignUp.password);
+      if (status == "true") {
+        DataHelper.saveFcmToken(
+          Collections.FCM_TOKENS,
+          userData!.id,
+        );
+        setState(() {
+          loader = false;
+        });
+        CustomDialogBox.hideLoading();
+        Get.offAll(() => const HomePage());
+      } else {
+        setState(() {
+          loader = false;
+        });
+        Get.snackbar('Error', status);
+      }
+    } else {
+      CustomDialogBox.hideLoading();
+
+      setState(() {
+        loader = false;
+      });
+    }
   }
 }

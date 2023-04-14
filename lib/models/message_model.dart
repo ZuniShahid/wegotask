@@ -4,32 +4,27 @@ class MessageModel {
     this.messageText,
     this.senderId,
     this.senderPicture,
-    this.endTime,
-    this.endate,
+    this.createdAt,
   });
 
   String? messageId;
   String? messageText;
   String? senderId;
   String? senderPicture;
-  String? endTime;
-  String? endate;
+  DateTime? createdAt;
 
   factory MessageModel.fromJson(Map<String, dynamic> json) => MessageModel(
-        messageId: json["message_id"],
-        messageText: json["message_text"],
+        messageId: json["_id"],
+        messageText: json["message"],
         senderId: json["sender_id"],
-        senderPicture: json["sender_picture"],
-        endTime: json["end_time"],
-        endate: json["create_date"],
+        senderPicture: json["image"],
+    createdAt: json['created_at'].toDate()
       );
 
   Map<String, dynamic> toJson() => {
-        "message_id": messageId,
-        "message_text": messageText,
+        "_id": messageId,
+        "message": messageText,
         "sender_id": senderId,
-        "sender_picture": senderPicture,
-        "end_time": endTime,
-        "create_date": endate,
+        "image": senderPicture,
       };
 }

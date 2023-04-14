@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import '../common/custom_toast.dart';
 import '../controller/general_controller.dart';
 import '../global_variables.dart';
 import '../models/task_history_model.dart';
@@ -79,8 +80,16 @@ class DataHelper {
     return user;
   }
 
+  static fetchTask(String id) async {
+    var userDoc =
+        await FirebaseFirestore.instance.collection('post').doc(id).get();
+    UserModel user = UserModel.fromJson(userDoc.data()!);
+    return user;
+  }
+
   static addCollectionData(
       CollectionReference collection, String docId, var data) {
+    print('dasd');
     collection.doc(docId).set(data);
   }
 
@@ -118,20 +127,18 @@ class DataHelper {
     }
   }
 
-  static updateQuery(
+  static dynamic updateQuery(
       var collection, String docId, String key, var value) async {
-    await collection
-        .doc(docId)
-        .update({key: value})
-        .then((_) => print('Success'))
-        .catchError((error) {
-          if (error is FirebaseException && error.code == 'not-found') {
-            collection.doc(docId).set({key: value});
-          } else {
-            throw error;
-          }
-          print('updateQuery Failed: $error');
-        });
+    await collection.doc(docId).update({key: value}).then((_) {
+      print('Success');
+    }).catchError((error) {
+      if (error is FirebaseException && error.code == 'not-found') {
+        collection.doc(docId).set({key: value});
+      } else {
+        throw error;
+      }
+      print('updateQuery Failed: $error');
+    });
   }
 
   static updateProfile(var collection, String docId, var data) async {
@@ -197,77 +204,186 @@ class DataHelper {
     return documents.docs;
   }
 
-  static fetchTaskFromId(String id) async {
-    var userDoc =
-        await FirebaseFirestore.instance.collection('tasks').doc(id).get();
-    TaskModel task = TaskModel.fromJson(userDoc.data()!);
-    if (task.totalUsers == task.activeUsers) {
-      return 'Task User Limit is Full';
-    }
-    if (task.creatorId == userData!.id) {
-      return 'You are the Creator of this Task.';
-    }
-    for (int i = 0; i < task.usersList!.length; i++) {
-      var taskId = task.usersList![i];
-      if (taskId.toString() == userData!.id.toString()) {
-        return 'You are already added';
-      }
-    }
-    updateQuery(Collections.TASKS, task.id.toString(), 'activeUser',
-        task.activeUsers! + 1);
-    updateQuery(Collections.TASKS, task.id.toString(), 'usersList',
-        task.activeUsers! + 1);
-
-    return task;
-  }
-
-  static searchTaskFromCollection(
-      var collection, String key, String value) async {
+  static addInTask(var collection, String key, String value) async {
     var documents =
         await collection.where(key, isEqualTo: value).limit(1).get();
 
     if (documents.docs.isNotEmpty) {
       TaskModel task = TaskModel.fromJson(documents.docs[0].data()!);
       if (task.totalUsers == task.activeUsers) {
-        return 'Task User Limit is Full';
+        CustomToast.errorToast(message: 'Task User Limit is Full');
+        return 0;
       }
       if (task.creatorId == userData!.id) {
-        print('You are the Creator of this Task.');
-        return 'You are the Creator of this Task.';
+        CustomToast.errorToast(message: 'You are the Creator of this Task.');
+        return 0;
+      }
+      for (int i = 0; i < task.fcmTokenList!.length; i++) {
+        var taskId = task.fcmTokenList![i];
+        if (taskId.toString() == state.FCM_TOKEN.toString()) {
+          CustomToast.errorToast(message: 'You are already added');
+          return 0;
+        }
       }
       for (int i = 0; i < task.usersList!.length; i++) {
         var taskId = task.usersList![i];
         if (taskId.toString() == userData!.id.toString()) {
-          print('You are already added');
-          return 'You are already added';
+          CustomToast.errorToast(message: 'You are already added');
+          return 0;
         }
       }
       updateQuery(Collections.TASKS, task.id.toString(), 'activeUser',
           task.activeUsers! + 1);
+      var activeUser = {
+        '_uid': userData!.id,
+        'task_status': false,
+      };
+      collection.doc(task.id).set({
+        'active_user_task_status': FieldValue.arrayUnion([activeUser])
+      }, SetOptions(merge: true));
       collection.doc(task.id).set({
         'users_list': FieldValue.arrayUnion([userData!.id])
       }, SetOptions(merge: true));
-      print('You are added in Task');
-      return 'You are added in Task';
+      collection.doc(task.id).set({
+        'fcm_token_list': FieldValue.arrayUnion([state.FCM_TOKEN.toString()])
+      }, SetOptions(merge: true));
+      CustomToast.errorToast(message: 'You are added in Task');
+      var map = {
+        "title": 'New User',
+        "body": 'New User Added',
+      };
+      var msg = {'action_type': 'new_user', 'data': userData!.toJson()};
+
+      await sendNotification(map, msg, task.creatorId);
+      return 1;
     } else {
-      print('Task not found');
+      CustomToast.errorToast(message: 'Task not found');
+      return 0;
     }
+  }
+
+  static searchTask(var collection, String key, String value) async {
+    var documents =
+        await collection.where(key, isEqualTo: value).limit(1).get();
+    TaskModel taskModel = TaskModel();
+    if (documents.docs.isNotEmpty) {
+      taskModel = TaskModel.fromJson(documents.docs[0].data());
+      return taskModel;
+    } else {
+      CustomToast.errorToast(message: 'Task not found');
+      return 0;
+    }
+  }
+
+  static Future<void> updateArrayElement(String documentId) async {
+    try {
+      // Step 1: Get Firestore instance and reference to 'tasks' collection
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      var tasksCollection = firestore.collection('tasks');
+
+      // Step 2: Get the document containing the array
+      var docSnapshot = await tasksCollection.doc(documentId).get();
+      if (docSnapshot.exists) {
+        // Step 3: Get the array field from the document
+        List<dynamic> arrayField =
+            docSnapshot.data()!['active_user_task_status'];
+
+        // Step 4: Loop through the array to find the index of the element to update
+        for (int i = 0; i < arrayField.length; i++) {
+          Map<String, dynamic> element =
+              Map<String, dynamic>.from(arrayField[i]);
+          if (element['_uid'] == userData!.id) {
+            // Step 5: Update the status of the element
+            element['task_status'] = true;
+          }
+          arrayField[i] = element;
+        }
+
+        // Step 6: Update the array field in the document
+        await tasksCollection.doc(documentId).update({
+          'active_user_task_status': [arrayField],
+        });
+
+        print('Array element updated successfully');
+      } else {
+        throw Exception('Document does not exist');
+      }
+    } catch (error) {
+      print('Error updating array element: $error');
+    }
+  }
+
+  static updateMapList(String documentId) async {
+    var docRef = FirebaseFirestore.instance.collection('tasks').doc(documentId);
+
+    docRef.get().then((docSnapshot) async {
+      if (docSnapshot.exists) {
+        List<dynamic> myList = docSnapshot.get('active_user_task_status');
+        await docRef.update({
+          'active_user_task_status': FieldValue.delete(),
+        });
+
+        for (int i = 0; i < myList.length; i++) {
+          Map<String, dynamic> map = myList[i];
+          if (map['_uid'] == userData!.id) {
+            map['task_status'] = true;
+            break;
+          }
+        }
+
+        docRef.update({'active_user_task_status': myList}).then((_) {
+          print('List updated successfully');
+        });
+      } else {
+        print('Document does not exist');
+      }
+    }).catchError((error) {
+      print('Error updating list: $error');
+    });
+  }
+
+  static fetchTasksFromCollection(
+      var collection, String key, String value) async {
+    var documents = await collection.where(key, arrayContains: value).get();
+    List<TaskModel> tasks = [];
+
+    for (var doc in documents.docs) {
+      var data = doc.data();
+      tasks.add(TaskModel.fromJson(data));
+    }
+    print('USERDATA!.ID: ${userData!.id}');
+    var document2 =
+        await collection.where('creator_id', isEqualTo: userData!.id).get();
+    for (var doc in document2.docs) {
+      var data = doc.data();
+      tasks.add(TaskModel.fromJson(data));
+    }
+
+    return tasks;
   }
 
   static sendNotification(var map, var data, var userId) async {
     String url = "https://fcm.googleapis.com/fcm/send";
     String token = await getFcmToken(Collections.FCM_TOKENS, userId);
+
+    print('TOKEN: $token');
+    var apiKey =
+        'AAAAKV3X9-o:APA91bGhAk9YsHmVF0zv2rHBMZdtd7bTgiY6vbyNncvG79ldl9WmrjWLPwj33uNq1V5kuAjepZXXiGYZy2mIwEZN9h7Vcphj6VxMuyQ_eUCwui66yI7Il_yusnUa8yQT-2JetYOwxVs-';
     var apiData = {
       "to": token,
       "notification": {"title": map['title'], "body": map['body']},
       "data": data
     };
+
+    print('APIDATA: $apiData');
     try {
-      http.Response response =
-          await http.post(Uri.parse(url), body: jsonEncode(apiData), headers: {
-        // "Authorization": "Bearer ${AppConstants.API_KEY}",
-        "Content-Type": "application/json"
-      });
+      http.Response response = await http.post(Uri.parse(url),
+          body: jsonEncode(apiData),
+          headers: {
+            "Authorization": "Bearer $apiKey",
+            "Content-Type": "application/json"
+          });
+      print('RESPONSE.BODY: ${response.body}');
       if (response.statusCode == 200) {
         final result = jsonDecode(response.body);
         if (result['success'] == 1) {
