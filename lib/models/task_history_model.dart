@@ -90,13 +90,14 @@ class TaskModel {
 
 class ActiveUserTaskStatus {
   ActiveUserTaskStatus({
+    this.notes,
     this.uid,
     this.taskStatus,
   });
 
   String? uid;
   bool? taskStatus;
-
+  final List<Map<String, dynamic>>? notes;
   factory ActiveUserTaskStatus.fromJson(Map<String, dynamic> json) =>
       ActiveUserTaskStatus(
         uid: json["_uid"],

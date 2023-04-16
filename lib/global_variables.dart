@@ -34,3 +34,5 @@ Future getUserUID() async {
   String result = pref.getString("userId") ?? '';
   return result;
 }
+
+String FIREBASE_SOUND_NAME = 'alarm';

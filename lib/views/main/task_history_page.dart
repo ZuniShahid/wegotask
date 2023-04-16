@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../common/app_bar_widget.dart';
+import '../../common/big_small_text.dart';
 import '../../common/colors.dart';
 import '../../common/gradient_text.dart';
 import '../../models/task_history_model.dart';
@@ -16,60 +17,6 @@ class TaskHistoryPage extends StatefulWidget {
 }
 
 class _TaskHistoryPageState extends State<TaskHistoryPage> {
-  Widget buildText(parts, text) {
-    if (parts.length > 1) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(
-            height: 5,
-          ),
-          Text(
-            parts[0],
-            style: const TextStyle(
-              color: Colors.white,
-              letterSpacing: 2,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(
-            height: 2,
-          ),
-          FittedBox(
-            fit: BoxFit.contain,
-            child: Text(
-              parts.sublist(1).join(' '),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      );
-    } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(
-            height: 5,
-          ),
-          Text(
-            text,
-            style: const TextStyle(
-              color: Colors.white,
-              letterSpacing: 2,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +33,6 @@ class _TaskHistoryPageState extends State<TaskHistoryPage> {
             itemCount: widget.taskList.length,
             itemBuilder: (BuildContext context, int index) {
               TaskModel taskHistory = widget.taskList[index];
-              List<String> parts = taskHistory.title!.split(' ');
               return InkWell(
                 onTap: () {
                   Get.to(() => CreateNewTask(
@@ -144,7 +90,7 @@ class _TaskHistoryPageState extends State<TaskHistoryPage> {
                               const SizedBox(
                                 width: 20,
                               ),
-                              buildText(parts, taskHistory.title),
+                              BigSmallText(text: taskHistory.title.toString()),
                             ],
                           ),
                           Column(

@@ -43,11 +43,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _passwordVisible = false;
   final TextEditingController _phoneController = TextEditingController();
 
+  String phoneNumber = '';
+
   Widget phoneNumberField() {
     return InternationalPhoneNumberInput(
       onInputChanged: (PhoneNumber number) {
         var countryCode = number.dialCode.toString();
-        _phoneController.text = countryCode + _phoneController.text.trim();
+        phoneNumber = countryCode + _phoneController.text.trim();
         if (number.phoneNumber!.isNotEmpty) {
           if (_phoneController.text[0] == "0") {
             setState(() {
@@ -55,6 +57,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             });
           }
         }
+
+        print('PHONENUMBER: $phoneNumber');
         setState(() {});
       },
       onInputValidated: (bool value) {
@@ -123,7 +127,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     userSignUp.lastName = _lastNameController.text;
     userSignUp.email = _emailController.text.trim();
     userSignUp.password = _passwordController.text;
-    userSignUp.contact = _phoneController.text.trim();
+    userSignUp.contact = phoneNumber.trim();
     userSignUp.fcmToken = Get.find<GeneralController>().FCM_TOKEN.value;
     bool uniqueUsername = await AuthHelper.checkUniqueness(
         'email', _emailController.text, Collections.USERS);
@@ -132,13 +136,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'name', _firstNameController.text, Collections.USERS);
       if (uniqueEmail) {
         bool isUnique = await AuthHelper.checkUniqueness(
-            'contact', _phoneController.text.trim(), Collections.USERS);
+            'contact', phoneNumber.trim(), Collections.USERS);
         if (isUnique) {
           CustomDialogBox.hideLoading();
-
+          print('PHONENUMBER.TRIM(): ${phoneNumber.trim()}');
           // registerUser();
           Get.to(OTPScreen(
-            phoneNumber: _phoneController.text.trim(),
+            phoneNumber: phoneNumber.trim(),
           ));
         } else {
           setState(() {
@@ -478,6 +482,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         Expanded(
                           child: InternationalPhoneNumberInput(
                             onInputChanged: (PhoneNumber number) {
+                              var countryCode = number.dialCode.toString();
+                              phoneNumber =
+                                  countryCode + _phoneController.text.trim();
+                              if (number.phoneNumber!.isNotEmpty) {
+                                if (_phoneController.text[0] == "0") {
+                                  setState(() {
+                                    _phoneController.text = "";
+                                  });
+                                }
+                              }
+
+                              print('PHONENUMBER: $phoneNumber');
                               setState(() {});
                             },
                             onInputValidated: (bool value) {

@@ -250,9 +250,13 @@ class DataHelper {
       CustomToast.errorToast(message: 'You are added in Task');
       var map = {
         "title": 'New User',
-        "body": 'New User Added',
+        "body": 'You are added in Task',
       };
-      var msg = {'action_type': 'new_user', 'data': userData!.toJson()};
+      var msg = {
+        'action_type': 'new_user',
+        'data': userData!.toJson(),
+        'sound': FIREBASE_SOUND_NAME
+      };
 
       await sendNotification(map, msg, task.creatorId);
       return 1;
@@ -314,32 +318,46 @@ class DataHelper {
   }
 
   static updateMapList(String documentId) async {
-    var docRef = FirebaseFirestore.instance.collection('tasks').doc(documentId);
+    final data = ActiveUserTaskStatus(
+      notes: [
+        {
+          '_uid': userData!.id,
+          'task_status': true,
+        },
+      ],
+    );
+    FirebaseFirestore.instance.doc('notes').set(
+      {
+        'active_user_task_status': FieldValue.arrayUnion([data.notes![0]]),
+      },
+      SetOptions(merge: true),
+    );
+    // var docRef = FirebaseFirestore.instance.collection('tasks').doc(documentId);
 
-    docRef.get().then((docSnapshot) async {
-      if (docSnapshot.exists) {
-        List<dynamic> myList = docSnapshot.get('active_user_task_status');
-        await docRef.update({
-          'active_user_task_status': FieldValue.delete(),
-        });
+    // docRef.get().then((docSnapshot) async {
+    //   if (docSnapshot.exists) {
+    //     List<dynamic> myList = docSnapshot.get('active_user_task_status');
+    //     await docRef.update({
+    //       'active_user_task_status': FieldValue.delete(),
+    //     });
 
-        for (int i = 0; i < myList.length; i++) {
-          Map<String, dynamic> map = myList[i];
-          if (map['_uid'] == userData!.id) {
-            map['task_status'] = true;
-            break;
-          }
-        }
+    //     for (int i = 0; i < myList.length; i++) {
+    //       Map<String, dynamic> map = myList[i];
+    //       if (map['_uid'] == userData!.id) {
+    //         map['task_status'] = true;
+    //         break;
+    //       }
+    //     }
 
-        docRef.update({'active_user_task_status': myList}).then((_) {
-          print('List updated successfully');
-        });
-      } else {
-        print('Document does not exist');
-      }
-    }).catchError((error) {
-      print('Error updating list: $error');
-    });
+    //     docRef.update({'active_user_task_status': myList}).then((_) {
+    //       print('List updated successfully');
+    //     });
+    //   } else {
+    //     print('Document does not exist');
+    //   }
+    // }).catchError((error) {
+    //   print('Error updating list: $error');
+    // });
   }
 
   static fetchTasksFromCollection(
@@ -360,6 +378,20 @@ class DataHelper {
     }
 
     return tasks;
+  }
+
+  static sendAlarm() async {
+    var map = {
+      "title": 'Deadline',
+      "body": 'Task is still not complete',
+    };
+    var msg = {
+      'action_type': 'new_user',
+      'data': userData!.toJson(),
+      'sound': FIREBASE_SOUND_NAME
+    };
+
+    await sendNotification(map, msg, userData!.id);
   }
 
   static sendNotification(var map, var data, var userId) async {

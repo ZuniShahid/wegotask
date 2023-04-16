@@ -6,8 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../common/big_small_text.dart';
 import '../../common/colors.dart';
-import '../../common/custom_dialog.dart';
 import '../../common/gradient_text.dart';
 import '../../common/input_decorations.dart';
 import '../../controller/general_controller.dart';
@@ -188,21 +188,22 @@ class _HomePageState extends State<HomePage> {
                   ),
                   ElevatedButton(
                       onPressed: () async {
-                        CustomDialogBox.showLoading('Loading');
-                        var taskModel = await DataHelper.searchTask(
-                            Collections.TASKS, 'id', _taskKey.text);
-                        CustomDialogBox.hideLoading();
-                        if (taskModel != 0) {
-                          Get.to(() => CreateNewTask(
-                                taskModel: taskModel,
-                                viewTask: true,
-                                acceptReject: true,
-                              ));
-                          print('TASKMODEL: ${taskModel.id}');
-                          setState(() {});
-                        }
+                        await DataHelper.sendAlarm();
+                        // CustomDialogBox.showLoading('Loading');
+                        // var taskModel = await DataHelper.searchTask(
+                        //     Collections.TASKS, 'id', _taskKey.text);
+                        // CustomDialogBox.hideLoading();
+                        // if (taskModel != 0) {
+                        //   Get.to(() => CreateNewTask(
+                        //         taskModel: taskModel,
+                        //         viewTask: true,
+                        //         acceptReject: true,
+                        //       ));
+                        //   print('TASKMODEL: ${taskModel.id}');
+                        //   setState(() {});
+                        // }
 
-                        CustomDialogBox.hideLoading();
+                        // CustomDialogBox.hideLoading();
 
                         // ByteData soundData =
                         //     await rootBundle.load('assets/sounds/alarm.mp3');
@@ -276,205 +277,195 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   const SizedBox(height: 40),
-                  Obx(() => Container(
-                        child: _controller.taskList.isEmpty
-                            ? Column(
-                                children: [
-                                  Image.asset(
-                                    'assets/icons/no_task_history.png',
-                                    width: 234,
-                                    height: 163,
-                                  ),
-                                  const SizedBox(height: 40),
-                                  const Text(
-                                    'NO TASK HISTORY',
-                                    style: TextStyle(
-                                        color: AppColors.appGrey,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 22),
-                                  ),
-                                ],
-                              )
-                            : GridView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                gridDelegate:
-                                    const SliverGridDelegateWithMaxCrossAxisExtent(
-                                  maxCrossAxisExtent: 200,
-                                  crossAxisSpacing: 15,
-                                  mainAxisSpacing: 10,
+                  Obx(
+                    () => Container(
+                      child: _controller.taskList.isEmpty
+                          ? Column(
+                              children: [
+                                Image.asset(
+                                  'assets/icons/no_task_history.png',
+                                  width: 234,
+                                  height: 163,
                                 ),
-                                itemCount: _controller.taskList.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  TaskModel taskHistory =
-                                      _controller.taskList[index];
-                                  List<String> parts =
-                                      taskHistory.title!.split(' ');
-                                  return InkWell(
-                                    onTap: () {
-                                      Get.to(() => CreateNewTask(
-                                            viewTask: true,
-                                            taskModel: taskHistory,
-                                          ));
-                                    },
-                                    child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            14, 11, 9, 2),
-                                        decoration: BoxDecoration(
-                                          color: taskHistory.completedStatus!
-                                              ? AppColors.secondary
-                                              : AppColors.primary,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.grey,
-                                              offset: Offset(3.0, 3.0),
-                                              blurRadius: 10.0,
-                                              spreadRadius: 2.0,
-                                            ), //BoxShadow
-                                            BoxShadow(
-                                              color: Colors.white,
-                                              offset: Offset(0.0, 0.0),
-                                              blurRadius: 0.0,
-                                              spreadRadius: 0.0,
-                                            ), //BoxShadow
-                                          ],
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
+                                const SizedBox(height: 40),
+                                const Text(
+                                  'NO TASK HISTORY',
+                                  style: TextStyle(
+                                      color: AppColors.appGrey,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 22),
+                                ),
+                              ],
+                            )
+                          : GridView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              gridDelegate:
+                                  const SliverGridDelegateWithMaxCrossAxisExtent(
+                                maxCrossAxisExtent: 200,
+                                crossAxisSpacing: 15,
+                                mainAxisSpacing: 10,
+                              ),
+                              itemCount: _controller.taskList.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                TaskModel taskHistory =
+                                    _controller.taskList[index];
+                                List<String> parts =
+                                    taskHistory.title!.split(' ');
+                                return InkWell(
+                                  onTap: () async {
+                                    Get.to(() => CreateNewTask(
+                                          viewTask: true,
+                                          taskModel: taskHistory,
+                                        ));
+                                  },
+                                  child: Container(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          14, 11, 9, 2),
+                                      decoration: BoxDecoration(
+                                        color: taskHistory.completedStatus!
+                                            ? AppColors.secondary
+                                            : AppColors.primary,
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            offset: Offset(3.0, 3.0),
+                                            blurRadius: 10.0,
+                                            spreadRadius: 2.0,
+                                          ), //BoxShadow
+                                          BoxShadow(
+                                            color: Colors.white,
+                                            offset: Offset(0.0, 0.0),
+                                            blurRadius: 0.0,
+                                            spreadRadius: 0.0,
+                                          ), //BoxShadow
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              GradientText(
+                                                '${index + 1}.',
+                                                style: const TextStyle(
+                                                  fontSize: 45,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.white.withOpacity(1),
+                                                    Colors.white.withOpacity(0),
+                                                  ],
+                                                ),
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    taskHistory.endDate
+                                                        .toString(),
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    taskHistory.endTime
+                                                        .toString(),
+                                                    style: const TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                          BigSmallText(
+                                              text:
+                                                  taskHistory.title.toString()),
+                                          FittedBox(
+                                            fit: BoxFit.contain,
+                                            child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                GradientText(
-                                                  '${index + 1}.',
-                                                  style: const TextStyle(
-                                                    fontSize: 45,
-                                                    fontWeight: FontWeight.w800,
-                                                  ),
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      Colors.white
-                                                          .withOpacity(1),
-                                                      Colors.white
-                                                          .withOpacity(0),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment.start,
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: [
-                                                    Text(
-                                                      taskHistory.endDate
-                                                          .toString(),
-                                                      style: const TextStyle(
+                                                    Container(
+                                                      decoration:
+                                                          const BoxDecoration(
                                                         color: Colors.white,
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.w700,
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.person,
+                                                        color: taskHistory
+                                                                .completedStatus!
+                                                            ? AppColors
+                                                                .secondary
+                                                            : AppColors.primary,
                                                       ),
                                                     ),
-                                                    Text(
-                                                      taskHistory.endTime
-                                                          .toString(),
-                                                      style: const TextStyle(
-                                                        fontSize: 10,
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.w700,
+                                                    FittedBox(
+                                                      fit: BoxFit.contain,
+                                                      child: Text(
+                                                        ' + ${taskHistory.totalUsers}',
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
                                                       ),
                                                     ),
                                                   ],
-                                                )
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 15,
-                                            ),
-                                            Expanded(
-                                              child: buildText(
-                                                  parts, taskHistory.title),
-                                            ),
-                                            FittedBox(
-                                              fit: BoxFit.contain,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Container(
-                                                        decoration:
-                                                            const BoxDecoration(
-                                                          color: Colors.white,
-                                                          shape:
-                                                              BoxShape.circle,
-                                                        ),
-                                                        child: Icon(
-                                                          Icons.person,
-                                                          color: taskHistory
-                                                                  .completedStatus!
-                                                              ? AppColors
-                                                                  .secondary
-                                                              : AppColors
-                                                                  .primary,
-                                                        ),
-                                                      ),
-                                                      FittedBox(
-                                                        fit: BoxFit.contain,
-                                                        child: Text(
-                                                          ' + ${taskHistory.totalUsers}',
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 10,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  FittedBox(
-                                                    fit: BoxFit.contain,
-                                                    child: Text(
-                                                      taskHistory
-                                                              .completedStatus!
-                                                          ? 'COMPLETED'
-                                                          : 'INCOMPLETED',
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                FittedBox(
+                                                  fit: BoxFit.contain,
+                                                  child: Text(
+                                                    taskHistory.completedStatus!
+                                                        ? 'COMPLETED'
+                                                        : 'INCOMPLETED',
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                     ),
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        )),
-                                  );
-                                },
-                              ),
-                      )),
+                                          ),
+                                        ],
+                                      )),
+                                );
+                              },
+                            ),
+                    ),
+                  ),
                   const SizedBox(
                     height: 30,
                   ),
@@ -705,3 +696,5 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+

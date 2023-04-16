@@ -48,6 +48,7 @@ class _OTPScreenState extends State<OTPScreen> {
   void initState() {
     errorController = StreamController<ErrorAnimationType>();
     startTimer();
+    sendOTP();
     super.initState();
   }
 
@@ -67,7 +68,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
   sendOTP() {
     _auth.verifyPhoneNumber(
-        phoneNumber: '+923227501415',
+        phoneNumber: widget.phoneNumber,
         timeout: const Duration(seconds: 60),
         verificationCompleted: (AuthCredential authCredential) {
           print("verificationCompleted");
@@ -214,7 +215,7 @@ class _OTPScreenState extends State<OTPScreen> {
                       fontSize: 12, fontWeight: FontWeight.w400),
                 ),
               ),
-              _counter != 0
+              _counter == 0
                   ? const Text(
                       "Code Expired",
                       style: TextStyle(color: Colors.red, fontSize: 16),
@@ -275,15 +276,58 @@ class _OTPScreenState extends State<OTPScreen> {
                   minimumSize: Size(85.w, 6.h),
                   maximumSize: Size(85.w, 6.h),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   CustomDialogBox.showLoading('Verifying OTP');
+                  formKey.currentState!.validate();
+                  if (currentText.length != 6) {
+                    errorController!.add(ErrorAnimationType.shake);
+                    setState(() {
+                      hasError = true;
+                      error = " Invalid OTP";
+                    });
+                  } else {
+                    setState(
+                      () {
+                        loader = true;
+                        hasError = false;
+                      },
+                    );
+                    var credential = PhoneAuthProvider.credential(
+                        verificationId: newVerificationId,
+                        smsCode: currentText);
+                    print("credential");
+                    print(credential);
+                    try {
+                      var userCred = await _auth
+                          .signInWithCredential(PhoneAuthProvider.credential(
+                        verificationId: newVerificationId,
+                        smsCode: currentText,
+                      ));
+                      print("userCred");
+                      print(userCred.additionalUserInfo!.isNewUser);
+                      print('OTP Verified');
+                    } catch (e) {
+                      if (e.toString().contains('invalid')) {
+                        error = "Invalid code";
+                      } else if (e.toString().contains('expired')) {
+                        error = "Code is expired";
+                      }
+                      Get.snackbar("Error", error);
+                    }
+                    setState(() {
+                      loader = false;
+                    });
+                    if (error == "") {
+                      Get.offAll(() => const HomePage());
+                    }
+                  }
 
                   // Get.to(
                   //   () => const NewPassword(),
                   //   duration: const Duration(milliseconds: 30),
                   //   transition: Transition.leftToRight,
                   // );
-                  registerUser();
+                  // registerUser();
                 },
                 child: loader == true
                     ? const CircularProgressIndicator.adaptive()
