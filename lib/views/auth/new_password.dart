@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -19,6 +20,7 @@ class _NewPasswordState extends State<NewPassword> {
   bool _confirmPasswordVisible = false;
   final TextEditingController _passwordController = TextEditingController();
   bool _passwordVisible = false;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Column innerBody() {
     return Column(
@@ -177,8 +179,12 @@ class _NewPasswordState extends State<NewPassword> {
                   minimumSize: Size(85.w, 6.h),
                   maximumSize: Size(85.w, 6.h),
                 ),
-                onPressed: () {
-                  Get.to(
+                onPressed: () async {
+                  await _auth.currentUser!
+                      .updatePassword(_passwordController.text);
+                  await _auth.signOut();
+                  Get.snackbar("Success", "Password changed successfully");
+                  Get.offAll(
                     () => const LoginScreen(),
                     duration: const Duration(milliseconds: 30),
                     transition: Transition.leftToRight,

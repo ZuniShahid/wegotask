@@ -14,10 +14,13 @@ import '../../global_variables.dart';
 import '../main/home_page.dart';
 
 import '../../common/colors.dart';
+import 'new_password.dart';
 
 class OTPScreen extends StatefulWidget {
-  const OTPScreen({Key? key, required this.phoneNumber}) : super(key: key);
-
+  const OTPScreen(
+      {Key? key, required this.phoneNumber, this.fromForgotPass = false})
+      : super(key: key);
+  final bool? fromForgotPass;
   final String phoneNumber;
 
   @override
@@ -297,28 +300,32 @@ class _OTPScreenState extends State<OTPScreen> {
                         smsCode: currentText);
                     print("credential");
                     print(credential);
-                    try {
-                      var userCred = await _auth
-                          .signInWithCredential(PhoneAuthProvider.credential(
-                        verificationId: newVerificationId,
-                        smsCode: currentText,
-                      ));
-                      print("userCred");
-                      print(userCred.additionalUserInfo!.isNewUser);
-                      print('OTP Verified');
-                    } catch (e) {
-                      if (e.toString().contains('invalid')) {
-                        error = "Invalid code";
-                      } else if (e.toString().contains('expired')) {
-                        error = "Code is expired";
+                    if (widget.fromForgotPass == true) {
+                      Get.to(() => const NewPassword());
+                    } else {
+                      try {
+                        var userCred = await _auth
+                            .signInWithCredential(PhoneAuthProvider.credential(
+                          verificationId: newVerificationId,
+                          smsCode: currentText,
+                        ));
+                        print("userCred");
+                        print(userCred.additionalUserInfo!.isNewUser);
+                        print('OTP Verified');
+                      } catch (e) {
+                        if (e.toString().contains('invalid')) {
+                          error = "Invalid code";
+                        } else if (e.toString().contains('expired')) {
+                          error = "Code is expired";
+                        }
+                        Get.snackbar("Error", error);
                       }
-                      Get.snackbar("Error", error);
-                    }
-                    setState(() {
-                      loader = false;
-                    });
-                    if (error == "") {
-                      Get.offAll(() => const HomePage());
+                      setState(() {
+                        loader = false;
+                      });
+                      if (error == "") {
+                        Get.offAll(() => const HomePage());
+                      }
                     }
                   }
 

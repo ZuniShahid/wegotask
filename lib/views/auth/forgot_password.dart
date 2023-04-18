@@ -1,22 +1,28 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import '../../common/colors.dart';
-import '../../common/custom_validators.dart';
 import '../../common/input_decorations.dart';
 import 'otp_screen.dart';
 
 class ForgotPassword extends StatefulWidget {
-  const ForgotPassword({Key? key}) : super(key: key);
+  final bool? fromForgotPassword;
+  const ForgotPassword({Key? key, this.fromForgotPassword = false})
+      : super(key: key);
 
   @override
   State<ForgotPassword> createState() => _ForgotPasswordState();
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
-  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  PhoneNumber numberrrr =
+      PhoneNumber(isoCode: Platform.localeName.split('_').last);
+  String phoneNumber = '';
 
   Widget doubleSpace() {
     return const SizedBox(
@@ -76,17 +82,50 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       width: 20,
                     ),
                     Expanded(
-                      child: TextFormField(
-                        controller: _phoneNumberController,
-                        validator: (value) => CustomValidator.email(value),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        cursorColor: Colors.grey,
-                        decoration: InputDecorations.inputDecorationAllBorder(
-                          hintText: 'Enter Your Email Address',
+                      child: InternationalPhoneNumberInput(
+                        onInputChanged: (PhoneNumber number) {
+                          var countryCode = number.dialCode.toString();
+                          phoneNumber =
+                              countryCode + _phoneController.text.trim();
+                          if (number.phoneNumber!.isNotEmpty) {
+                            if (_phoneController.text[0] == "0") {
+                              setState(() {
+                                _phoneController.text = "";
+                              });
+                            }
+                          }
+
+                          print('PHONENUMBER: $phoneNumber');
+                          setState(() {});
+                        },
+                        onInputValidated: (bool value) {
+                          print(value);
+                          setState(() {});
+                        },
+                        selectorConfig: const SelectorConfig(
+                          leadingPadding: 0,
+                          trailingSpace: false,
+                          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                          setSelectorButtonAsPrefixIcon: true,
+                          showFlags: true,
                         ),
+                        ignoreBlank: true,
+                        autoValidateMode: AutovalidateMode.onUserInteraction,
+                        initialValue: PhoneNumber(isoCode: 'PK'),
+                        inputDecoration:
+                            InputDecorations.inputDecorationAllBorder(
+                          hintText: 'Phone Number',
+                        ),
+                        spaceBetweenSelectorAndTextField: 0,
+                        isEnabled: true,
+                        textFieldController: _phoneController,
+                        formatInput: true,
+                        keyboardType: const TextInputType.numberWithOptions(
+                            signed: false, decimal: false),
+                        inputBorder: InputBorder.none,
+                        onSaved: (PhoneNumber number) {
+                          print('On Saved: $number');
+                        },
                       ),
                     ),
                   ],
@@ -105,8 +144,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ),
                 onPressed: () {
                   Get.to(
-                    () => const OTPScreen(
-                      phoneNumber: '0300******90',
+                    () => OTPScreen(
+                      fromForgotPass: widget.fromForgotPassword,
+                      phoneNumber: phoneNumber.trim(),
                     ),
                     duration: const Duration(milliseconds: 30),
                     transition: Transition.leftToRight,

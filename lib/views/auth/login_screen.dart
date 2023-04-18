@@ -159,7 +159,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         Get.to(
-                          () => const ForgotPassword(),
+                          () => const ForgotPassword(
+                            fromForgotPassword: true,
+                          ),
                           duration: const Duration(milliseconds: 30),
                           transition: Transition.leftToRight,
                         );
@@ -237,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               idController.text.trim(),
                               passwordController.text);
                           CustomDialogBox.hideLoading();
-                            setState(() {
+                          setState(() {
                             loader = false;
                           });
                           if (status == 'true') {
