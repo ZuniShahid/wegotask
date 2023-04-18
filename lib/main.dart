@@ -274,8 +274,10 @@ class MyBehavior extends ScrollBehavior {
 }
 
 Future<void> scheduleNotificationUntilEndDate(endDate, interval) async {
+  interval = int.parse(interval.toString());
+
   print('SCHEDULENOTIFICATIONUNTILENDDATE:');
-  
+
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   flutterLocalNotificationsPlugin
@@ -306,36 +308,31 @@ Future<void> scheduleNotificationUntilEndDate(endDate, interval) async {
       androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
+      matchDateTimeComponents: DateTimeComponents.dateAndTime,
       payload: "Scheduled Notification");
 
-  Timer.periodic(const Duration(minutes: 1), (timer) {
+  Timer.periodic(Duration(minutes: interval), (timer) {
     final tz.Location detroit = tz.getLocation('Asia/Karachi');
     final tz.TZDateTime now = tz.TZDateTime.now(detroit);
 
     print('TZ.TZDATETIME: $now');
     print('ENDDATE: $endDate');
     if (now.isBefore(endDate)) {
-    //   var body = {
-    //     "title": "Alarm",
-    //     "end_date": endDate.toString(),
-    //     "task_interval": interval - 1
-    //   };
-    //   DataHelper.sendAlarm(body);
+      var body = {
+        "title": "Alarm",
+        "end_date": endDate.toString(),
+        "task_interval": interval
+      };
+      DataHelper.sendAlarm(body);
       print('NOW.ISBEFORE:');
       print('tz.TZDateTime NOW: $now');
-      flutterLocalNotificationsPlugin.zonedSchedule(
-          0,
-          "Scheduled Notification",
-          "This notification will be repeated until the end date is reached",
-          tz.TZDateTime.now(tz.local).add(Duration(minutes: interval)),
-          generalNotificationDetails,
-          androidAllowWhileIdle: true,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          matchDateTimeComponents: DateTimeComponents.time,
-          payload: "Scheduled Notification");
     } else {
+      var body = {
+        "title": "Alarm",
+        "end_date": now.toString(),
+        "task_interval": interval
+      };
+      DataHelper.sendAlarm(body);
       timer.cancel(); // Cancel the timer when the end date is reached
     }
   });

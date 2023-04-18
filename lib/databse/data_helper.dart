@@ -332,6 +332,7 @@ class DataHelper {
       },
       SetOptions(merge: true),
     );
+   
     // var docRef = FirebaseFirestore.instance.collection('tasks').doc(documentId);
 
     // docRef.get().then((docSnapshot) async {

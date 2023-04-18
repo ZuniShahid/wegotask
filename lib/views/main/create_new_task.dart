@@ -874,9 +874,14 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                           _taskKey.text,
                                           'completed_status',
                                           true);
+                                      final tz.Location detroit =
+                                          tz.getLocation('Asia/Karachi');
+
+                                      tz.TZDateTime now =
+                                          tz.TZDateTime.now(detroit);
                                       var body = {
                                         "title": "Alarm",
-                                        "end_date": DateTime.now().toString(),
+                                        "end_date": now.toString(),
                                         "task_interval":
                                             int.parse(_taskInterval.text)
                                       };
@@ -921,7 +926,34 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                 : () async {
                                     await DataHelper.updateMapList(
                                         widget.taskModel!.id.toString());
+                                    var map = {
+                                      "title": 'Complete',
+                                      "body":
+                                          "${userData!.id} has completed his task "
+                                    };
+                                    var msg = {
+                                      'action_type': 'Task Completion',
+                                      'data': userData!.toJson(),
+                                      'sound': FIREBASE_SOUND_NAME
+                                    };
+                                    for (int i = 0;
+                                        i < widget.taskModel!.usersList!.length;
+                                        i++) {
+                                      await DataHelper.sendNotification(map,
+                                          msg, widget.taskModel!.usersList![i]);
+                                    }
+                                    final tz.Location detroit =
+                                        tz.getLocation('Asia/Karachi');
 
+                                    tz.TZDateTime now =
+                                        tz.TZDateTime.now(detroit);
+                                    var body = {
+                                      "title": "Alarm",
+                                      "end_date": now.toString(),
+                                      "task_interval":
+                                          int.parse(_taskInterval.text)
+                                    };
+                                    DataHelper.sendAlarm(body);
                                     Get.offAll(() => const HomePage());
                                   },
                             child: Center(
