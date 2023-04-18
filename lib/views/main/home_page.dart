@@ -8,6 +8,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../common/big_small_text.dart';
 import '../../common/colors.dart';
+import '../../common/custom_dialog.dart';
 import '../../common/gradient_text.dart';
 import '../../common/input_decorations.dart';
 import '../../controller/general_controller.dart';
@@ -188,22 +189,21 @@ class _HomePageState extends State<HomePage> {
                   ),
                   ElevatedButton(
                       onPressed: () async {
-                        await DataHelper.sendAlarm();
-                        // CustomDialogBox.showLoading('Loading');
-                        // var taskModel = await DataHelper.searchTask(
-                        //     Collections.TASKS, 'id', _taskKey.text);
-                        // CustomDialogBox.hideLoading();
-                        // if (taskModel != 0) {
-                        //   Get.to(() => CreateNewTask(
-                        //         taskModel: taskModel,
-                        //         viewTask: true,
-                        //         acceptReject: true,
-                        //       ));
-                        //   print('TASKMODEL: ${taskModel.id}');
-                        //   setState(() {});
-                        // }
+                        CustomDialogBox.showLoading('Loading');
+                        var taskModel = await DataHelper.searchTask(
+                            Collections.TASKS, 'id', _taskKey.text);
+                        CustomDialogBox.hideLoading();
+                        if (taskModel != 0) {
+                          Get.to(() => CreateNewTask(
+                                taskModel: taskModel,
+                                viewTask: true,
+                                acceptReject: true,
+                              ));
+                          print('TASKMODEL: ${taskModel.id}');
+                          setState(() {});
+                        }
 
-                        // CustomDialogBox.hideLoading();
+                        CustomDialogBox.hideLoading();
 
                         // ByteData soundData =
                         //     await rootBundle.load('assets/sounds/alarm.mp3');
@@ -696,5 +696,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-

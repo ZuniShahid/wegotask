@@ -1,26 +1,28 @@
 import 'message_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class TaskModel {
-  TaskModel({
-    this.id,
-    this.creatorId,
-    this.endDate,
-    this.endTime,
-    this.endDay,
-    this.title,
-    this.desc,
-    this.taskPermission,
-    this.totalUsers,
-    this.activeUsers,
-    this.completedStatus,
-    this.alarmTime,
-    this.repeatAlarm,
-    this.repeatInterval,
-    this.usersList,
-    this.fcmTokenList,
-    this.messageModelList,
-    this.activeUserTaskStatus,
-  });
+  TaskModel(
+      {this.id,
+      this.creatorId,
+      this.endDate,
+      this.endTime,
+      this.endDay,
+      this.title,
+      this.desc,
+      this.taskPermission,
+      this.totalUsers,
+      this.activeUsers,
+      this.completedStatus,
+      this.alarmTime,
+      this.repeatAlarm,
+      this.repeatInterval,
+      this.usersList,
+      this.fcmTokenList,
+      this.messageModelList,
+      this.activeUserTaskStatus,
+      this.exactEndTIme});
 
   String? id;
   String? creatorId;
@@ -36,6 +38,7 @@ class TaskModel {
   String? alarmTime;
   String? repeatInterval;
   bool? repeatAlarm;
+  dynamic exactEndTIme;
   List<String>? usersList;
   List<String?>? fcmTokenList;
   List<MessageModel>? messageModelList;
@@ -55,6 +58,9 @@ class TaskModel {
         completedStatus: json["completed_status"],
         alarmTime: json["alarm_time"],
         repeatAlarm: json["repeat_alarm"],
+        exactEndTIme: json["exact_end_date"] == null
+            ? null
+            : convertTimestampToLocalTime(json["exact_end_date"]),
         repeatInterval: json["repeat_interval"],
         usersList: json["users_list"] == null
             ? []
@@ -108,4 +114,20 @@ class ActiveUserTaskStatus {
         "_uid": uid,
         "task_status": taskStatus,
       };
+}
+
+tz.TZDateTime convertTimestampToLocalTime(Timestamp timestamp) {
+  final utcDateTime = timestamp.toDate().toUtc();
+  final pakistan = tz.getLocation('Asia/Karachi');
+  final pakistanDateTime = tz.TZDateTime.from(utcDateTime, pakistan);
+  return pakistanDateTime;
+}
+
+
+tz.TZDateTime convertStringToLocalTime(String dateTimeString) {
+  final DateTime dateTime = DateTime.parse(dateTimeString);
+  final utcDateTime = dateTime.toUtc();
+  final pakistan = tz.getLocation('Asia/Karachi');
+  final pakistanDateTime = tz.TZDateTime.from(utcDateTime, pakistan);
+  return pakistanDateTime;
 }

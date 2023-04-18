@@ -380,14 +380,14 @@ class DataHelper {
     return tasks;
   }
 
-  static sendAlarm() async {
+  static sendAlarm(body) async {
     var map = {
       "title": 'Deadline',
       "body": 'Task is still not complete',
     };
     var msg = {
-      'action_type': 'new_user',
-      'data': userData!.toJson(),
+      'action_type': 'alarm',
+      'data': body,
       'sound': FIREBASE_SOUND_NAME
     };
 

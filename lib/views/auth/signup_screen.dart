@@ -28,7 +28,7 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   bool loader = false;
-  PhoneNumber number =
+  PhoneNumber numberrrr =
       PhoneNumber(isoCode: Platform.localeName.split('_').last);
 
   final TextEditingController _confirmPasswordController =
@@ -510,7 +510,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ignoreBlank: true,
                             autoValidateMode:
                                 AutovalidateMode.onUserInteraction,
-                            initialValue: number,
+                            initialValue: numberrrr,
                             inputDecoration:
                                 InputDecorations.inputDecorationAllBorder(
                               hintText: 'Phone Number',

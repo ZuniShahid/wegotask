@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:alarm/alarm.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -9,12 +10,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
+import 'databse/data_helper.dart';
 import 'firebase_options.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 import 'common/themes.dart';
 import 'controller/general_controller.dart';
 import 'global_variables.dart';
+import 'models/task_history_model.dart';
 import 'prefrences/theme_prefrence.dart';
 import 'views/splash_screen.dart';
 
@@ -39,10 +43,23 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       NotificationDetails(android: androidPlatformChannelSpecifics);
   print("_firebaseMessagingBackgroundHandler");
   print(message.data);
-
-  await FlutterLocalNotificationsPlugin().show(123, message.notification!.title,
-      message.notification!.body, platformChannelSpecifics,
-      payload: 'data');
+  print("message.data");
+  print(message.data);
+  var res = jsonDecode(message.data['data']);
+  print('RES: $res');
+  print('MESSAGE.DATA["TITLE"]: ${res["title"]}');
+  if (res["title"] == 'Alarm') {
+    var endDate = convertStringToLocalTime(res['end_date']);
+    var taskInterval = res['task_interval'];
+    scheduleNotificationUntilEndDate(endDate, taskInterval);
+  } else {
+    await FlutterLocalNotificationsPlugin().show(
+        123,
+        message.notification!.title,
+        message.notification!.body,
+        platformChannelSpecifics,
+        payload: 'data');
+  }
 
   print("Handling a background message: ${message.data}");
 }
@@ -63,19 +80,31 @@ void _handleMessage(RemoteMessage message) async {
       NotificationDetails(android: androidPlatformChannelSpecifics);
   print("_handleMessage");
   print(message.data);
+  print("message.data");
+  print(message.data);
+  var res = jsonDecode(message.data['data']);
+  print('RES: $res');
+  print('MESSAGE.DATA["TITLE"]: ${res["title"]}');
 
-  await FlutterLocalNotificationsPlugin().show(123, message.notification!.title,
-      message.notification!.body, platformChannelSpecifics,
-      payload: 'data');
+  if (res["title"] == 'Alarm') {
+    var endDate = convertStringToLocalTime(res['end_date']);
+    var taskInterval = res['task_interval'];
+    scheduleNotificationUntilEndDate(endDate, taskInterval);
+  } else {
+    await FlutterLocalNotificationsPlugin().show(
+        123,
+        message.notification!.title,
+        message.notification!.body,
+        platformChannelSpecifics,
+        payload: 'data');
+  }
+
   print("in app open");
   print(message.data['title']);
 }
 
 void onSelectNotification(String? payload) {
   print('navigate');
-  print(navigate!.data['title']);
-  if (navigate!.data['title'] == 'New post found') {}
-  if (navigate!.data['title'] == ' ') {}
 }
 
 void onDidReceiveLocalNotification(
@@ -106,10 +135,22 @@ Future<void> _selectNotification(RemoteMessage message) async {
       NotificationDetails(android: androidPlatformChannelSpecifics);
   print("message.data");
   print(message.data);
+  var res = jsonDecode(message.data['data']);
+  print('RES: $res');
+  print('MESSAGE.DATA["TITLE"]: ${res["title"]}');
 
-  await FlutterLocalNotificationsPlugin().show(123, message.notification!.title,
-      message.notification!.body, platformChannelSpecifics,
-      payload: 'data');
+  if (res["title"] == 'Alarm') {
+    var endDate = convertStringToLocalTime(res['end_date']);
+    var taskInterval = res['task_interval'];
+    scheduleNotificationUntilEndDate(endDate, taskInterval);
+  } else {
+    await FlutterLocalNotificationsPlugin().show(
+        123,
+        message.notification!.title,
+        message.notification!.body,
+        platformChannelSpecifics,
+        payload: 'data');
+  }
 
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('app_icon');
@@ -125,6 +166,7 @@ Future<void> _selectNotification(RemoteMessage message) async {
 }
 
 void main() async {
+  tz.initializeTimeZones();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   Get.put(GeneralController());
@@ -132,12 +174,6 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessageOpenedApp.listen((_handleMessage));
   FirebaseMessaging.onMessage.listen((_selectNotification));
-  final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-
-  print('NOW: $now');
-
-  scheduleNotificationUntilEndDate(
-      tz.TZDateTime(tz.local, now.year, now.month, now.day, 23,30));
 
   AndroidNotificationChannel channel = AndroidNotificationChannel(
     'high_importance_channel', // id
@@ -237,8 +273,9 @@ class MyBehavior extends ScrollBehavior {
   }
 }
 
-Future<void> scheduleNotificationUntilEndDate(DateTime endDate) async {
-  print('SCHEDULENOTIFICATIONUNTILENDDATE: $scheduleNotificationUntilEndDate');
+Future<void> scheduleNotificationUntilEndDate(endDate, interval) async {
+  print('SCHEDULENOTIFICATIONUNTILENDDATE:');
+  
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   flutterLocalNotificationsPlugin
@@ -256,16 +293,15 @@ Future<void> scheduleNotificationUntilEndDate(DateTime endDate) async {
     sound: RawResourceAndroidNotificationSound(FIREBASE_SOUND_NAME),
     channelDescription: 'repeating description',
   );
-  var generalNotificationDetails = NotificationDetails(
+  NotificationDetails generalNotificationDetails = NotificationDetails(
     android: androidNotificationDetails,
   );
 
-  // Schedule the first notification immediately
   await flutterLocalNotificationsPlugin.zonedSchedule(
       0,
       "Scheduled Notification",
       "This notification will be repeated until the end date is reached",
-      tz.TZDateTime.now(tz.local).add(const Duration(seconds: 25)),
+      tz.TZDateTime.now(tz.local).add(Duration(minutes: interval)),
       generalNotificationDetails,
       androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation:
@@ -273,20 +309,26 @@ Future<void> scheduleNotificationUntilEndDate(DateTime endDate) async {
       matchDateTimeComponents: DateTimeComponents.time,
       payload: "Scheduled Notification");
 
-  // Schedule notifications every 15 minutes until the end date is reached
   Timer.periodic(const Duration(minutes: 1), (timer) {
-    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    final tz.Location detroit = tz.getLocation('Asia/Karachi');
+    final tz.TZDateTime now = tz.TZDateTime.now(detroit);
 
     print('TZ.TZDATETIME: $now');
     print('ENDDATE: $endDate');
     if (now.isBefore(endDate)) {
+    //   var body = {
+    //     "title": "Alarm",
+    //     "end_date": endDate.toString(),
+    //     "task_interval": interval - 1
+    //   };
+    //   DataHelper.sendAlarm(body);
       print('NOW.ISBEFORE:');
       print('tz.TZDateTime NOW: $now');
       flutterLocalNotificationsPlugin.zonedSchedule(
           0,
           "Scheduled Notification",
           "This notification will be repeated until the end date is reached",
-          tz.TZDateTime.now(tz.local).add(const Duration(seconds: 25)),
+          tz.TZDateTime.now(tz.local).add(Duration(minutes: interval)),
           generalNotificationDetails,
           androidAllowWhileIdle: true,
           uiLocalNotificationDateInterpretation:

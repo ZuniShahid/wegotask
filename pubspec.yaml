@@ -30,7 +30,7 @@ dependencies:
   get: ^4.6.5
   get_storage: ^2.1.1
   http: ^0.13.5
-  intl: null
+  intl: 
   intl_phone_number_input: ^0.7.2
   path_provider: ^2.0.14
   pin_code_fields: ^7.4.0

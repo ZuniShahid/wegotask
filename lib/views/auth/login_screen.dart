@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../common/colors.dart';
+import '../../common/custom_dialog.dart';
 import '../../common/custom_validators.dart';
 import '../../common/input_decorations.dart';
 import '../../components/account_exists_check.dart';
@@ -229,15 +230,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           }
                         }
                       : () async {
-                          setState(() {
-                            loader = true;
-                          });
+                          CustomDialogBox.showLoading('Signing In');
 
                           var status = await AuthHelper.login(
                               Collections.USERS,
                               idController.text.trim(),
                               passwordController.text);
-                          setState(() {
+                          CustomDialogBox.hideLoading();
+                            setState(() {
                             loader = false;
                           });
                           if (status == 'true') {
