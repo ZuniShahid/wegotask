@@ -41,9 +41,14 @@ class AuthHelper {
       );
       var document = await collection.doc(userCredential.user!.uid).get();
       if (document.exists) {
+        print('document.exists');
         userData = UserModel.fromJson(document.data()!);
+        print('document.exists2');
+
         DataHelper.updateFcmToken(Collections.FCM_TOKENS,
             userCredential.user!.uid, state.FCM_TOKEN.value);
+        print('document.exists3');
+
         setUserLoggedIn(true);
         saveUserUID(userCredential.user!.uid);
         return "true";

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../views/main/chat_box.dart';
-
-class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
+class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool chatButton;
   final VoidCallback? onPressed;
   final VoidCallback? chatOnPressed;
 
-  AppBarWidget(
-      {super.key, this.title = '', this.chatButton = true, this.onPressed, this.chatOnPressed});
+  const AppBarWidget(
+      {super.key,
+      this.title = '',
+      this.chatButton = true,
+      this.onPressed,
+      this.chatOnPressed});
 
   @override
   Widget build(BuildContext context) {

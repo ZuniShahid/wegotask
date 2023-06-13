@@ -13,6 +13,7 @@ import '../../databse/auth_helper.dart';
 import '../../databse/collections.dart';
 import '../main/home_page.dart';
 import 'forgot_password.dart';
+import 'social_login.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -207,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 doubleSpace(),
                 const Center(
                   child: Text(
-                    'Login To You Account',
+                    'Login To Your Account',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -267,6 +268,29 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 singleSpace(),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.primary),
+                      ),
+                      onPressed: () {
+                        GoogleAuthenticateProvider().signIn(true);
+                      },
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/images/google.png',
+                              height: 20,
+                              width: 20,
+                            ),
+                            const Text('Google'),
+                          ],
+                        ),
+                      )),
+                ),
                 const AlreadyHaveAnAccountCheck(
                   login: true,
                 ),

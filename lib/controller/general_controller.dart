@@ -17,6 +17,7 @@ class GeneralController extends GetxController {
   RxString LOGIN_TYPE = ''.obs;
   RxInt TOTAL_PRODUCTS = 0.obs;
   RxList<TaskModel> taskList = <TaskModel>[].obs;
+  RxString NEW_USER_UID = ''.obs;
 
   @override
   void onInit() {

@@ -243,7 +243,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 children: [
                   const Text(
                     "Didn't receive the code?",
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 10),
                   ),
                   resendLoader
                       ? const Padding(

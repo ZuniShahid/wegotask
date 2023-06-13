@@ -180,9 +180,10 @@ class _NewPasswordState extends State<NewPassword> {
                   maximumSize: Size(85.w, 6.h),
                 ),
                 onPressed: () async {
+
                   await _auth.currentUser!
                       .updatePassword(_passwordController.text);
-                  await _auth.signOut();
+                  // await _auth.signOut();
                   Get.snackbar("Success", "Password changed successfully");
                   Get.offAll(
                     () => const LoginScreen(),

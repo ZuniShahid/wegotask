@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "177668093930-ib6r46p9lh9vs2ra4adjjmh0u8pan605.apps.googleusercontent.com",
+          "client_id": "177668093930-irg5rtvqfe3gka8siidmnt70l0geajnc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.wegotask",
+            "certificate_hash": "cd3286b70e2fc3c6754cb297cedf3020fdee65dd"
+          }
+        },
+        {
+          "client_id": "177668093930-4t7o0pifb2j7fqm3ppm5kagvtkunpmso.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,8 +35,15 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "177668093930-ib6r46p9lh9vs2ra4adjjmh0u8pan605.apps.googleusercontent.com",
+              "client_id": "177668093930-4t7o0pifb2j7fqm3ppm5kagvtkunpmso.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "177668093930-g3bhagbi3n5m8t131ah1m8ie8i6nuvd4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.wegotask"
+              }
             }
           ]
         }

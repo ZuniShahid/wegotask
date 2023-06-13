@@ -75,6 +75,7 @@ class _HomePageState extends State<HomePage> {
                   Collections.FCM_TOKENS, userData!.id, '');
               FirebaseAuth.instance.signOut();
               setUserLoggedIn(false);
+              userData = null;
               Get.offAll(const LoginScreen());
             },
             icon: const Icon(
