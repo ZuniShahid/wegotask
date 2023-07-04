@@ -47,7 +47,7 @@ class GoogleAuthenticateProvider extends ChangeNotifier {
           registerUser();
         } else {
           var status = await AuthHelper.login(
-              Collections.USERS, userSignUp.email, userSignUp.password);
+              Collections.USERS, userSignUp.email, _currentUser!.id.toString());
           if (status == 'true') {
             Get.offAll(const HomePage());
           }
